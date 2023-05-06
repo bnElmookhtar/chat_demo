@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
-import 'package:goat/models/sign_in.dart';
-import 'package:goat/styles/colors.dart';
-
+import 'package:goat/screens//register/sign_in.dart';
 class SignUp extends StatefulWidget {
   @override
   State<SignUp> createState() => _SignUpState();
 }
-
 class _SignUpState extends State<SignUp> {
   var name = TextEditingController(),
       phoneNum = TextEditingController(),
       confirmPhone = TextEditingController();
-  Color wit = wit_300;
+  var nameValdate ;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blue_1000,
       appBar: AppBar(
-        title: defualtText(
-          txt: "WELCOME IN SIGNUP PAGE ",
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25),bottomStart:Radius.circular(25) ),
         ),
-        backgroundColor: blk_200,
+        title:Text("WELCOME IN SIGNUP PAGE "),
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -33,59 +29,53 @@ class _SignUpState extends State<SignUp> {
             defualtText(
               txt: "SIGN UP",
               fontwit: FontWeight.bold,
-              color: wit,
             ),
             defualtVersticalSizedBox(height: 40.0),
-            defualtTextForm(
-                onTap: () {},
-                decoration: InputDecoration(
-                  label: defualtText(txt: "Name",color: wit),
-                  border: const OutlineInputBorder(),
-                  prefixIcon: const Icon(Icons.email),
-                ),
-                controller: name,
-                keyboardType: TextInputType.text,
-                onSubmit: (value) {
-                  name = value;
-                }),
-            defualtVersticalSizedBox(height: 40.0),
-            defualtTextForm(
+            TextFormField(
               onTap: () {},
               decoration: InputDecoration(
-                label: defualtText(
-                  txt: "Phone Number",
-                  color: wit,
-                ),
+                label: defualtText(txt: "Name",),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.email),
+              ),
+              validator:(nameValiate){},
+              controller: name,
+              keyboardType: TextInputType.text,
+              onFieldSubmitted: (value){},
+            ),
+            defualtVersticalSizedBox(height: 40.0),
+            TextFormField(
+              onTap: () {},
+              decoration: InputDecoration(
+                label:const Text("Phone Number"),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.phone),
               ),
+              validator:(phoneValiate){},
               controller: phoneNum,
               keyboardType: TextInputType.phone,
-              onSubmit: (value) {
-                phoneNum = value;
-              },
+              onFieldSubmitted: (value){phoneNum = value as TextEditingController;print(phoneNum.toString());},
             ),
             defualtVersticalSizedBox(height: 40.0),
-            defualtTextForm(
-                onTap: () {},
-                decoration: InputDecoration(
-                    label: defualtText(
-                      txt: "Confirm Phone Number",
-                      color: wit,
-                    ),
-                    border: const OutlineInputBorder(),
-                    prefixIcon: const Icon(Icons.phone)),
-                controller: confirmPhone,
-                keyboardType: TextInputType.phone,
-                onSubmit: (value) {
-                  confirmPhone = value;
-                }),
+            TextFormField(
+              onTap: () {},
+              decoration: InputDecoration(
+                label:const Text("Confirm Phone Number"),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.phone),
+              ),
+              validator:(confirmPhoneValiate){},
+              controller: confirmPhone,
+              keyboardType: TextInputType.phone,
+              onFieldSubmitted:(value){},
+            ),
             MaterialButton(
               onPressed: () {
                 print(name.text);
+                print(phoneNum.text);
               },
-              child: defualtText(txt: "REGISTER", color: wit),
-              color: blk_100,
+              child: defualtText(txt: "REGISTER" ),
+              color: Colors.blue,
               minWidth: double.infinity,
             ),
             Row(
@@ -93,7 +83,7 @@ class _SignUpState extends State<SignUp> {
               children: [
                 defualtText(
                   txt: "have an account ? ",
-                  color: wit,
+
                 ),
                 TextButton(
                   onPressed: () {

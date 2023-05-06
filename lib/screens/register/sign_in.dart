@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
-import 'package:goat/models/sign_up.dart';
-import 'package:goat/styles/colors.dart';
+import 'package:goat/layout/home_screen.dart';
+import 'package:goat/screens//register/sign_up.dart';
 
 class SignIn extends StatelessWidget {
   var phoneNum = TextEditingController();
@@ -9,15 +9,15 @@ class SignIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: blue_1000,
       appBar: AppBar(
-        title: defualtText(
-          txt: "WELCOME IN SIGNIN PAGE ",
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25),bottomStart:Radius.circular(25) ),
         ),
-        backgroundColor: blk_200,
+        title: const Text("WELCOME IN SIGNIN PAGE "),
       ),
       body: SingleChildScrollView(
-          child: Padding(        padding: const EdgeInsets.all(20.0),
+          child: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -25,49 +25,42 @@ class SignIn extends StatelessWidget {
             defualtText(
               txt: "SIGNIN",
               fontwit: FontWeight.bold,
-              color: wit_300,
             ),
             defualtVersticalSizedBox(height: 40.0),
-            defualtTextForm(
+            TextFormField(
               onTap: () {},
-              decoration: InputDecoration(
-                label: defualtText(
-                  txt: "Phone Number",
-                  color: wit_300,
-                ),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.phone),
-
+              decoration: const InputDecoration(
+                label: Text("Phone Number"),
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone),
               ),
               controller: phoneNum,
               keyboardType: TextInputType.phone,
-              onSubmit: (value) {
-                phoneNum = value;
-              },
+              onFieldSubmitted: (value) {},
             ),
             MaterialButton(
               onPressed: () {
+                debugPrint(phoneNum.text);
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (builder) => HomeScreen()));
               },
-              child: defualtText(txt: "Sign In", color: wit_300),
-              color: blk_100,
+              color: Colors.blue,
               minWidth: double.infinity,
+              child: const Text("Sign In"),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                defualtText(
-                  txt: "dont have an account ? ",
-                  color: wit_300,
-                ),
+                const Text("dont have an account ? "),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (Context) => SignUp(),
+                          builder: (context) => SignUp(),
                         ));
                   },
-                  child: Text("create one"),
+                  child: const Text("create one"),
                 ),
               ],
             )
