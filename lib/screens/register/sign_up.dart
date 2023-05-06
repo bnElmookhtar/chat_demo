@@ -9,7 +9,6 @@ class _SignUpState extends State<SignUp> {
   var name = TextEditingController(),
       phoneNum = TextEditingController(),
       confirmPhone = TextEditingController();
-  var nameValdate ;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,7 +16,11 @@ class _SignUpState extends State<SignUp> {
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25),bottomStart:Radius.circular(25) ),
         ),
-        title:Text("WELCOME IN SIGNUP PAGE "),
+        title:Column(
+          children: const [
+            Text("WELCOME IN SIGNUP PAGE "),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
           child: Padding(
@@ -46,23 +49,23 @@ class _SignUpState extends State<SignUp> {
             defualtVersticalSizedBox(height: 40.0),
             TextFormField(
               onTap: () {},
-              decoration: InputDecoration(
-                label:const Text("Phone Number"),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.phone),
+              decoration: const InputDecoration(
+                label:Text("Phone Number"),
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone),
               ),
               validator:(phoneValiate){},
               controller: phoneNum,
               keyboardType: TextInputType.phone,
-              onFieldSubmitted: (value){phoneNum = value as TextEditingController;print(phoneNum.toString());},
+              onFieldSubmitted: (value){phoneNum = value as TextEditingController;debugPrint(phoneNum.toString());},
             ),
             defualtVersticalSizedBox(height: 40.0),
             TextFormField(
               onTap: () {},
-              decoration: InputDecoration(
-                label:const Text("Confirm Phone Number"),
-                border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.phone),
+              decoration: const InputDecoration(
+                label:Text("Confirm Phone Number"),
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.phone),
               ),
               validator:(confirmPhoneValiate){},
               controller: confirmPhone,
@@ -71,12 +74,12 @@ class _SignUpState extends State<SignUp> {
             ),
             MaterialButton(
               onPressed: () {
-                print(name.text);
-                print(phoneNum.text);
+                debugPrint(name.text);
+                debugPrint(phoneNum.text);
               },
-              child: defualtText(txt: "REGISTER" ),
               color: Colors.blue,
               minWidth: double.infinity,
+              child: defualtText(txt: "REGISTER" ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -90,10 +93,10 @@ class _SignUpState extends State<SignUp> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (Context) => SignIn(),
+                          builder: (context) => SignIn(),
                         ));
                   },
-                  child: Text("sign in "),
+                  child: const Text("sign in "),
                 ),
               ],
             )

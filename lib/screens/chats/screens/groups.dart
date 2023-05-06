@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goat/component/select_group_card.dart';
+import 'package:goat/screens/chats/customs/select_group_card.dart';
 class Groups extends StatefulWidget {
   const Groups({Key? key}) : super(key: key);
 
@@ -13,9 +13,9 @@ class _GroupsState extends State<Groups> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (builder)=>SelectGroup()));
+          Navigator.push(context, MaterialPageRoute(builder: (builder)=>const SelectGroup()));
         },
-        child: Icon(Icons.add_box),
+        child: const Icon(Icons.add_box),
       ),
     );
   }

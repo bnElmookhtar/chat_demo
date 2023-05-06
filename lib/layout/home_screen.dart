@@ -24,20 +24,20 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       appBar: AppBar(
         title: const Text("GOAT"),
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.search_rounded,size: 30.0,),),
-         PopupMenuButton<String>(
-           onSelected: (value)=>print(value),
+          IconButton(onPressed: (){}, icon:const Icon(Icons.search_rounded,size: 30.0,),),
+          PopupMenuButton<String>(
+           onSelected: (value)=>debugPrint(value),
              itemBuilder: (itemBuilder)=>[
-           PopupMenuItem(child: Text("settings"),value: "settings",),
-           PopupMenuItem(child: Text("started messages"),value: "started message",),
+               const PopupMenuItem(value: "settings",child:  Text("settings"),),
+              const PopupMenuItem(value: "started message",child: Text("started messages"),),
          ]),
         ],
-        bottom: TabBar(
+        bottom:   TabBar(
           controller: _controller,
           indicatorColor: blk_200,
-          labelStyle: TextStyle(fontSize: 20.0),
-          tabs: [
-            Tab(icon: Icon(Icons.camera_alt_outlined)),
+          labelStyle:  const TextStyle(fontSize: 20.0),
+          tabs: const [
+            Tab(icon:Icon(Icons.camera_alt_outlined)),
             Tab(text: "CHATS"),
             Tab(text: "GROUPS"),
           ],
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       body: TabBarView(
         controller: _controller,
-        children: [
+        children: const [
           Camera(),
           Chats(),
           Groups(),

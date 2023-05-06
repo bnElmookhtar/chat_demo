@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:goat/component/reusable_component.dart';
 import 'package:goat/layout/home_screen.dart';
 import 'package:goat/screens//register/sign_up.dart';
+import 'package:goat/component/reusable_component.dart';
 
 class SignIn extends StatelessWidget {
   var phoneNum = TextEditingController();
@@ -42,7 +42,7 @@ class SignIn extends StatelessWidget {
               onPressed: () {
                 debugPrint(phoneNum.text);
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (builder) => HomeScreen()));
+                    context, MaterialPageRoute(builder: (builder) => const HomeScreen()));
               },
               color: Colors.blue,
               minWidth: double.infinity,

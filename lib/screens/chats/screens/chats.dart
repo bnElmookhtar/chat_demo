@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goat/component/select_contact_card.dart';
-import 'package:goat/component/custom_user.dart';
+import 'package:goat/screens/chats/customs/select_contact_card.dart';
+import 'package:goat/screens/chats/customs/custom_user.dart';
 import 'package:goat/models/chats_model.dart';
 class Chats extends StatefulWidget {
   const Chats({Key? key}) : super(key: key);
@@ -35,7 +35,7 @@ class _ChatsState extends State<Chats> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.push(context,MaterialPageRoute(builder: (builder)=>SelectContact()));
+          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const SelectContact()));
         },
         child: const Icon(Icons.message),
       ),

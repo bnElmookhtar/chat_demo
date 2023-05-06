@@ -23,7 +23,7 @@ class _ChatPageState extends State<ChatPage> {
       appBar: AppBar(
         title: Text(widget.chatModel.name),
       ),
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(
@@ -68,7 +68,7 @@ class _ChatPageState extends State<ChatPage> {
                         child: IconButton(
                           icon: const Icon(Icons.send, color: Colors.blue),
                           onPressed: () {
-                            print(newMessage.text);
+                            debugPrint(newMessage.text);
                           },
                         ))
                   ],

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/chats_model.dart';
+import '../../../models/chats_model.dart';
 import 'custom_user.dart';
 class SelectContact extends StatefulWidget {
   const SelectContact({Key? key}) : super(key: key);
@@ -26,17 +26,20 @@ class _SelectContactState extends State<SelectContact> {
     return Scaffold(
       appBar: AppBar(
         title:const Text("Select Contact"),
-        actions: [
+        actions: const [
           Icon(Icons.search_rounded),
         ],
       ),
       body: ListView.builder(
         itemCount: chats.length,
         itemBuilder: (context,index){
-          if(index ==0 )
-            return BottomCard();
-          else if(index ==1)
-            return Text("      Contacts on GOAT");
+          if(index ==0)
+          {
+            return const BottomCard();
+          }
+          else if(index ==1){
+            return const Text("      Contacts on GOAT");
+          }
           return CustomUser(chatModel: chats[index],);
 
         }
@@ -58,14 +61,14 @@ class _BottomCardState extends State<BottomCard> {
   Widget build(BuildContext context) {
     return ListTile(
       onTap: (){},
-      title: Text(
+      title: const Text(
         "New Contact",
         style: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
         ),
       ),
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
 
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,

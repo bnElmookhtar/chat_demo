@@ -23,7 +23,7 @@ class _GroupPageState extends State<GroupPage> {
       appBar: AppBar(
         title: Text(widget.groupModel.name),
       ),
-      body: Container(
+      body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         child: Stack(

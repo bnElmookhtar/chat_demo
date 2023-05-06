@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/groups_model.dart';
-import 'package:goat/component/custom_group.dart';
-import '../screens/chats/screens/chats.dart';
+import 'package:goat/screens/chats/customs/custom_group.dart';
+import '../screens/chats.dart';
 class SelectGroup extends StatefulWidget {
   const SelectGroup({Key? key}) : super(key: key);
 
@@ -25,17 +25,21 @@ class _SelectGroupState extends State<SelectGroup> {
     return Scaffold(
       appBar: AppBar(
         title:const Text("Select Group"),
-        actions: [
+        actions: const [
           Icon(Icons.search_rounded),
         ],
       ),
       body: ListView.builder(
           itemCount: groups.length,
           itemBuilder: (context,index){
-            if(index ==0 )
-              return BottomCard();
+            if(index ==0 ){
+              return const BottomCard();
+            }
+
             else if(index ==1)
-              return Text("      Groups on GOAT");
+              {
+                return const Text("      Groups on GOAT");
+              }
             return CustomGroup(groupModel: groups[index], );
           }
       ),
@@ -54,16 +58,16 @@ class _BottomCardState extends State<BottomCard> {
   Widget build(BuildContext context) {
     return ListTile(
         onTap: (){
-          Navigator.push(context,MaterialPageRoute(builder: (builder)=>Chats()),);
+          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const Chats()),);
         },
-        title: Text(
+        title: const Text(
           "New Group",
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundColor: Colors.green,
           foregroundColor: Colors.white,
           radius: 25.0,
