@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
 import 'package:goat/screens//register/sign_in.dart';
+import 'package:goat/server/request.dart';
 class SignUp extends StatefulWidget {
   @override
   State<SignUp> createState() => _SignUpState();
 }
 class _SignUpState extends State<SignUp> {
   var name = TextEditingController(),
-      phoneNum = TextEditingController(),
-      confirmPhone = TextEditingController();
+      phoneNum = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +39,7 @@ class _SignUpState extends State<SignUp> {
               decoration: InputDecoration(
                 label: defualtText(txt: "Name",),
                 border: const OutlineInputBorder(),
-                prefixIcon: const Icon(Icons.email),
+                prefixIcon: const Icon(Icons.person),
               ),
               validator:(nameValiate){},
               controller: name,
@@ -60,46 +60,36 @@ class _SignUpState extends State<SignUp> {
               onFieldSubmitted: (value){phoneNum = value as TextEditingController;debugPrint(phoneNum.toString());},
             ),
             defualtVersticalSizedBox(height: 40.0),
-            TextFormField(
-              onTap: () {},
-              decoration: const InputDecoration(
-                label:Text("Confirm Phone Number"),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
-              ),
-              validator:(confirmPhoneValiate){},
-              controller: confirmPhone,
-              keyboardType: TextInputType.phone,
-              onFieldSubmitted:(value){},
-            ),
             MaterialButton(
               onPressed: () {
-                debugPrint(name.text);
-                debugPrint(phoneNum.text);
+                  final String name_ = name.text.trim();
+                  final String phone = phoneNum.text.trim();
+                  request({
+                    "q": "register", 
+                    "phone": phone,
+                    "name": name_,
+                  }).then((ls) {
+                    if (ls == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Could not connect')),
+                      );
+                    } else if (ls[0].keys.contains("error")) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(ls[0]["error"])),
+                        );
+                      } else {
+                        final userId = ls[0]["id"];
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Created a new account")),
+                        );
+                        Navigator.pop(context);
+                      }
+                  });
               },
               color: Colors.blue,
               minWidth: double.infinity,
               child: defualtText(txt: "REGISTER" ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                defualtText(
-                  txt: "have an account ? ",
-
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignIn(),
-                        ));
-                  },
-                  child: const Text("sign in "),
-                ),
-              ],
-            )
           ],
         ),
       )),

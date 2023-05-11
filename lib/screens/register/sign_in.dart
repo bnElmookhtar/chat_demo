@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:goat/layout/home_screen.dart';
 import 'package:goat/screens//register/sign_up.dart';
 import 'package:goat/component/reusable_component.dart';
+import 'package:goat/server/request.dart';
 
 class SignIn extends StatelessWidget {
   var phoneNum = TextEditingController();
@@ -37,16 +38,32 @@ class SignIn extends StatelessWidget {
               controller: phoneNum,
               keyboardType: TextInputType.phone,
               onFieldSubmitted: (value) {},
-            ),
-            MaterialButton(
-              onPressed: () {
-                debugPrint(phoneNum.text);
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (builder) => const HomeScreen()));
-              },
-              color: Colors.blue,
-              minWidth: double.infinity,
-              child: const Text("Sign In"),
+              ),
+              MaterialButton(
+                onPressed: () async {
+                  final String phone = phoneNum.text.trim();
+                  request({
+                    "q": "login", 
+                    "phone": phone,
+                  }).then((ls) {
+                    if (ls == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Could not connect')),
+                      );
+                    } else if (ls[0].keys.contains("error")) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(ls[0]["error"])),
+                        );
+                      } else {
+                        final userId = ls[0]["id"];
+                        Navigator.push(
+                          context, MaterialPageRoute(builder: (builder) => const HomeScreen()));
+                      }
+                  });
+                },
+                color: Colors.blue,
+                minWidth: double.infinity,
+                child: const Text("Sign In"),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
