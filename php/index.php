@@ -1,28 +1,72 @@
 <?php 
 
-$debug = true;
 
 try {
 
   $db = new Database();
 
-  $queryType = $_POST["q"];
+  $q = $_POST["q"];
 
-  if ($queryType == "login") {
-    $db->runEcho(sprintf("select id from uesr where phone = '%s'", $_POST["phone"]));
+  //////////////////////////////////////////////////////
+  if ($q == "login") {
 
-  } elseif ($queryType == "register") {
+    $phone = $_POST["phone"];
 
+    if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
+      error("Invalid or not a phone number");
 
-  } elseif ($debug) {
-    $db->runEcho("select * from user");
-    echo "<p>REACHED END</p>";
+    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
 
+    if (count($results) == 0) 
+      error("Not registered yet");
+
+    done($results);
+  } 
+
+  //////////////////////////////////////////////////////
+  elseif ($q == "register") {
+
+    $phone = $_POST["phone"];
+    $name = $_POST["name"];
+
+    if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
+      error("Invalid or not a phone number");
+
+    if (strlen($name) >= 30 || strlen($name) < 2) 
+      error("Empty name field or not in range 2..29 letters");
+
+    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+
+    if (count($results) != 0) 
+    error("That phone is already registered");
+
+    $results = $db->run(sprintf("insert into user (phone, name) values ('%s', '%s')", 
+      $_POST["phone"], $_POST["name"]));
+
+    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+
+    done($results);
   }
+
+  //////////////////////////////////////////////////////
+
+  // only on debug
+  done($db->run("select * from user"));
 
 } catch (\Throwable $th) {
   echo $th;
 
+}
+
+
+function error($msg)
+{
+  die(sprintf('[{"error":"%s"}]', $msg));
+}
+
+function done($arrayOfMaps)
+{
+  die(json_encode($arrayOfMaps));
 }
 
 
@@ -56,11 +100,4 @@ class Database extends PDO
     $results->execute();
     return $results->fetchAll();
   }
-
-  // @param $query SQL Query to run
-  public function runEcho($query) : void
-  {
-    echo json_encode($this->run($query));
-  }
 }
-
