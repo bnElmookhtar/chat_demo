@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
-import 'package:goat/screens//register/sign_in.dart';
 import 'package:goat/server/request.dart';
 class SignUp extends StatefulWidget {
+  const SignUp({Key? key}) : super(key: key);
   @override
   State<SignUp> createState() => _SignUpState();
 }
@@ -41,7 +41,7 @@ class _SignUpState extends State<SignUp> {
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.person),
               ),
-              validator:(nameValiate){},
+              validator:(nameValiate){if(nameValiate.toString().isEmpty){return "name must be submited ";}},
               controller: name,
               keyboardType: TextInputType.text,
               onFieldSubmitted: (value){},

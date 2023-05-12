@@ -3,6 +3,8 @@ import 'package:goat/screens/chats/screens/brouadcast.dart';
 import 'package:goat/screens/chats/screens/chats.dart';
 import 'package:goat/screens/chats/screens/groups.dart';
 import 'package:goat/styles/colors.dart';
+
+import '../screens/settings/settings.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -31,7 +33,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           PopupMenuButton<String>(
            onSelected: (value)=>debugPrint(value),
              itemBuilder: (itemBuilder)=>[
-               const PopupMenuItem(value: "settings",child:  Text("settings"),),
+                PopupMenuItem(value: "settings",child:  Text("settings"), onTap: (){
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return Settings();
+                        },
+                      ),
+                    );
+                  });
+                }),
               const PopupMenuItem(value: "started message",child: Text("started messages"),),
          ]),
         ],

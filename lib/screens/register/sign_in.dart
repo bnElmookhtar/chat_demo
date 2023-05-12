@@ -4,7 +4,13 @@ import 'package:goat/screens//register/sign_up.dart';
 import 'package:goat/component/reusable_component.dart';
 import 'package:goat/server/request.dart';
 
-class SignIn extends StatelessWidget {
+class SignIn extends StatefulWidget {
+  const SignIn({Key? key}) : super(key: key);
+  @override
+  State<SignIn> createState() => _SignInState();
+}
+
+class _SignInState extends State<SignIn> {
   var phoneNum = TextEditingController();
 
   @override
@@ -36,7 +42,7 @@ class SignIn extends StatelessWidget {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.phone),
               ),
-              
+
               controller: phoneNum,
               keyboardType: TextInputType.phone,
               onFieldSubmitted: (value) {},
