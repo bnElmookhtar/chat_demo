@@ -5,7 +5,8 @@ import 'package:goat/component/reusable_component.dart';
 import 'package:goat/server/request.dart';
 
 class SignIn extends StatefulWidget {
-  const SignIn({Key? key}) : super(key: key);
+  final String? userId;
+  const SignIn({Key? key,this.userId}) : super(key: key);
   @override
   State<SignIn> createState() => _SignInState();
 }
@@ -67,7 +68,7 @@ class _SignInState extends State<SignIn> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => HomeScreen(id: userId,)));
+                            builder: (builder) => HomeScreen(userId: userId,)));
                   }
                 });
               },

@@ -3,7 +3,8 @@ import 'package:goat/screens/chats/customs/select_contact_card.dart';
 import 'package:goat/screens/chats/customs/custom_user.dart';
 import 'package:goat/models/chats_model.dart';
 class Chats extends StatefulWidget {
-  const Chats({Key? key}) : super(key: key);
+  final String? userId ;
+  const Chats({Key? key,this.userId}) : super(key: key);
 
   @override
   State<Chats> createState() => _ChatsState();

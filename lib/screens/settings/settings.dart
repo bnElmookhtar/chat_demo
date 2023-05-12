@@ -5,7 +5,8 @@ import 'package:goat/screens/settings/change_name.dart';
 import 'package:goat/screens/settings/change_phone.dart';
 
 class Settings extends StatefulWidget {
-  const Settings({Key? key}) : super(key: key);
+  final String? userId;
+  const Settings({Key? key,this.userId}) : super(key: key);
 
   @override
   State<Settings> createState() => _SettingsState();

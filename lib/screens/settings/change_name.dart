@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
 class ChangeName extends StatefulWidget {
-  const ChangeName({Key? key}) : super(key: key);
+  final String? userId ;
+  const ChangeName({Key? key,this.userId}) : super(key: key);
   @override
   State<ChangeName> createState() => _ChangeNameState();
 }

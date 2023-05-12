@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:goat/screens/chats/customs/select_group_card.dart';
 class Groups extends StatefulWidget {
-  const Groups({Key? key}) : super(key: key);
+  final String? userId ;
+  const Groups({Key? key,this.userId}) : super(key: key);
 
   @override
   State<Groups> createState() => _GroupsState();

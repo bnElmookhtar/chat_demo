@@ -4,7 +4,8 @@ import 'package:goat/screens/chats/customs/custom_broadcast_card.dart';
 import '../customs/select_contact_card.dart';
 
 class BroadCast extends StatefulWidget {
-  const BroadCast({Key? key}) : super(key: key);
+  final String? userId ;
+  const BroadCast({Key? key,this.userId}) : super(key: key);
 
   @override
   State<BroadCast> createState() => _BroadCast();

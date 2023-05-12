@@ -3,20 +3,15 @@ import 'package:goat/screens/chats/screens/brouadcast.dart';
 import 'package:goat/screens/chats/screens/chats.dart';
 import 'package:goat/screens/chats/screens/groups.dart';
 import 'package:goat/styles/colors.dart';
-
 import '../screens/settings/settings.dart';
 class HomeScreen extends StatefulWidget {
- const HomeScreen({Key? key,this.id}) : super(key: key);
-  final String? id ;
+  final String? userId ;
+ const HomeScreen({Key? key,this.userId}) : super(key: key);
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
-  TabController? _controller;
-
-
-  
+  TabController? _controller; 
   @override
   void initState() {
     // TODO: implement initState
@@ -62,9 +57,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _controller,
         children: const [
-          BroadCast(),
-          Chats(),
-          Groups(),
+          BroadCast(userId: "id"),
+          Chats(userId: "id"),
+          Groups(userId: "id"),
         ],
       ),
     );
