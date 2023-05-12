@@ -6,8 +6,8 @@ import 'package:goat/styles/colors.dart';
 
 import '../screens/settings/settings.dart';
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
-
+ const HomeScreen({Key? key,this.id}) : super(key: key);
+  final String? id ;
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }

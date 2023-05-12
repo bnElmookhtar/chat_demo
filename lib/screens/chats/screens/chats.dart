@@ -10,26 +10,7 @@ class Chats extends StatefulWidget {
 }
 
 class _ChatsState extends State<Chats> {
-  List<ChatModel> chats =[
-    ChatModel(name: "karim", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "mohamed", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "youssef", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "ali", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "nany", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "taha", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "awis", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "lamy", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "radwa", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "karim", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "mohamed", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "youssef", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "ali", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "nany", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "taha", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "awis", icon: "icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "lamy", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-    ChatModel(name: "radwa", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-  ];
+  List<ChatModel> chats =[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

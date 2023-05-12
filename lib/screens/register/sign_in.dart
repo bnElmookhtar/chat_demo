@@ -67,7 +67,7 @@ class _SignInState extends State<SignIn> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (builder) => const HomeScreen()));
+                            builder: (builder) => HomeScreen(id: userId,)));
                   }
                 });
               },
