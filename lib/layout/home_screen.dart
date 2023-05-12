@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:goat/screens/chats/screens/camera.dart';
+import 'package:goat/screens/chats/screens/brouadcast.dart';
 import 'package:goat/screens/chats/screens/chats.dart';
 import 'package:goat/screens/chats/screens/groups.dart';
 import 'package:goat/styles/colors.dart';
@@ -12,6 +12,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
   TabController? _controller;
+
+
+  
   @override
   void initState() {
     // TODO: implement initState
@@ -37,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           indicatorColor: blk_200,
           labelStyle:  const TextStyle(fontSize: 20.0),
           tabs: const [
-            Tab(icon:Icon(Icons.camera_alt_outlined)),
+            Tab(text: "Broadcast",),
             Tab(text: "CHATS"),
             Tab(text: "GROUPS"),
           ],
@@ -46,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       body: TabBarView(
         controller: _controller,
         children: const [
-          Camera(),
+          BroadCast(),
           Chats(),
           Groups(),
         ],

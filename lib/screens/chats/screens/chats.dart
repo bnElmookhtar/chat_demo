@@ -42,4 +42,7 @@ class _ChatsState extends State<Chats> {
       body: ListView.builder(itemBuilder: (context,index)=>CustomUser(chatModel: chats[index],),itemCount: chats.length,)
     );
   }
+
+
+  
 }

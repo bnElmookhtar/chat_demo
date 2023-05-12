@@ -12,7 +12,8 @@ class SignIn extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadiusDirectional.only(bottomEnd: Radius.circular(25),bottomStart:Radius.circular(25) ),
+          borderRadius: BorderRadiusDirectional.only(
+              bottomEnd: Radius.circular(25), bottomStart: Radius.circular(25)),
         ),
         title: const Text("WELCOME IN SIGNIN PAGE "),
       ),
@@ -35,35 +36,38 @@ class SignIn extends StatelessWidget {
                 border: OutlineInputBorder(),
                 prefixIcon: Icon(Icons.phone),
               ),
+              
               controller: phoneNum,
               keyboardType: TextInputType.phone,
               onFieldSubmitted: (value) {},
-              ),
-              MaterialButton(
-                onPressed: () async {
-                  final String phone = phoneNum.text.trim();
-                  request({
-                    "q": "login", 
-                    "phone": phone,
-                  }).then((ls) {
-                    if (ls == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Could not connect')),
-                      );
-                    } else if (ls[0].keys.contains("error")) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(ls[0]["error"])),
-                        );
-                      } else {
-                        final userId = ls[0]["id"];
-                        Navigator.push(
-                          context, MaterialPageRoute(builder: (builder) => const HomeScreen()));
-                      }
-                  });
-                },
-                color: Colors.blue,
-                minWidth: double.infinity,
-                child: const Text("Sign In"),
+            ),
+            MaterialButton(
+              onPressed: ()async {
+                final String phone = phoneNum.text.trim();
+                request({
+                  "q": "login",
+                  "phone": phone,
+                }).then((ls) {
+                  if (ls == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Could not connect')),
+                    );
+                  } else if (ls[0].keys.contains("error")) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(ls[0]["error"])),
+                    );
+                  } else {
+                    final userId = ls[0]["id"];
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (builder) => const HomeScreen()));
+                  }
+                });
+              },
+              color: Colors.blue,
+              minWidth: double.infinity,
+              child: const Text("Sign In"),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
