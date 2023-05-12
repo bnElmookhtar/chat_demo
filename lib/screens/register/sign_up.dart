@@ -64,20 +64,12 @@ class _SignUpState extends State<SignUp> {
               onPressed: () {
                   final String name_ = name.text.trim();
                   final String phone = phoneNum.text.trim();
-                  request({
+                  request(context, {
                     "q": "register", 
                     "phone": phone,
                     "name": name_,
                   }).then((ls) {
-                    if (ls == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Could not connect')),
-                      );
-                    } else if (ls[0].keys.contains("error")) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(ls[0]["error"])),
-                        );
-                      } else {
+                    if (ls != null) {
                         final userId = ls[0]["id"];
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text("Created a new account")),

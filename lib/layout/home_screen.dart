@@ -16,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   void initState() {
     // TODO: implement initState
     super.initState();
-    _controller = TabController(length: 3, vsync: this,initialIndex: 0);
+    _controller = TabController(length: 3, vsync: this,initialIndex: 1);
   }
   @override
   Widget build(BuildContext context) {

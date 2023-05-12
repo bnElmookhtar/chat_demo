@@ -51,19 +51,11 @@ class _SignInState extends State<SignIn> {
             MaterialButton(
               onPressed: ()async {
                 final String phone = phoneNum.text.trim();
-                request({
+                request(context, {
                   "q": "login",
                   "phone": phone,
                 }).then((ls) {
-                  if (ls == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Could not connect')),
-                    );
-                  } else if (ls[0].keys.contains("error")) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(ls[0]["error"])),
-                    );
-                  } else {
+                  if (ls != null) {
                     final userId = ls[0]["id"];
                     Navigator.push(
                         context,
