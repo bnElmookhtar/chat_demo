@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
 class ChangeName extends StatefulWidget {
   const ChangeName({Key? key}) : super(key: key);
-
   @override
   State<ChangeName> createState() => _ChangeNameState();
 }
 
 class _ChangeNameState extends State<ChangeName> {
+  var oldName = TextEditingController(),newName = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,8 +26,13 @@ class _ChangeNameState extends State<ChangeName> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.edit),
                   ),
+                  controller:  oldName,
                   keyboardType: TextInputType.text,
-                  onFieldSubmitted: (value) {},
+                  onFieldSubmitted: (value) {
+                    setState(() {
+                      value = oldName.toString();
+                    });
+                  },
                 ),
                 defualtVersticalSizedBox(height: 20.0),
                 TextFormField(
@@ -37,8 +42,13 @@ class _ChangeNameState extends State<ChangeName> {
                     border: OutlineInputBorder(),
                     prefixIcon: Icon(Icons.edit),
                   ),
+                  controller: newName,
                   keyboardType: TextInputType.text,
-                  onFieldSubmitted: (value) {},
+                  onFieldSubmitted: (value) {
+                    setState(() {
+                      value = newName.toString();
+                    });
+                  },
                 ),
                 defualtVersticalSizedBox(height: 20.0),
                 MaterialButton(
