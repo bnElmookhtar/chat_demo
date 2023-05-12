@@ -75,22 +75,134 @@ class Database extends PDO
   public function __construct()
   {
     // Create database if not exists
-    $_ = mysqli_connect("localhost", "root", "");
-    $_->query("CREATE DATABASE IF NOT EXISTS goat");
-    $_->close();
+    $conn = mysqli_connect("localhost", "root", "");
+    $conn->query(" create database if not exists goat ");
+    $conn->close();
 
     // Connect to database
     parent::__construct("mysql:host=localhost;dbname=goat", "root", "");
     $this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Create tables if not exists
+    // 1. user
     $this->run(
-      "CREATE TABLE IF NOT EXISTS user (
-      id int AUTO_INCREMENT PRIMARY KEY,
-      name varchar(30) NOT NULL,
-      phone char(11) NOT NULL
-      );"
+      "
+      create table if not exists `user` (
+      `id` int AUTO_INCREMENT PRIMARY KEY,
+      `name` varchar(30) NOT NULL,
+      `phone` char(11) NOT NULL
+      );
+      "
     );
+
+    // 2. group 
+    $this->run(
+      "
+      create table if not exists `group` (
+      `id` int AUTO_INCREMENT PRIMARY KEY,
+      `name` varchar(30) NOT NULL
+      );
+      "
+    );
+
+    // 3. broadcast
+    $this->run(
+      "
+      create table if not exists `broadcast` (
+      `id` int AUTO_INCREMENT PRIMARY KEY,
+      `sender_id` int not null,
+      FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`)
+      );
+      "
+    );
+
+    // 4. blocks_user
+    $this->run(
+      "
+      create table if not exists `blocks_user` (
+      `blocked_id` int not null,
+      `blocker_id` int not null,
+      FOREIGN KEY (`blocked_id`) REFERENCES `user`(`id`),
+      FOREIGN KEY (`blocker_id`) REFERENCES `user`(`id`)
+      );
+      "
+    );
+
+    // 5. message
+    $this->run(
+      "
+      create table if not exists `message` (
+      `id` int AUTO_INCREMENT PRIMARY KEY,
+      `text` varchar(1000) not null,
+      `timestamp` timestamp
+      );
+      "
+    );
+
+    // 6. sends_user
+    $this->run(
+      "
+      create table if not exists `sends_user` (
+      `receiver_id` int not null,
+      `sender_id` int not null,
+      `message_id` int not null,
+      FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`),
+      FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
+      FOREIGN KEY (`message_id`) REFERENCES `message`(`id`)
+      );
+      "
+    );
+
+    // 7. joins_group
+    $this->run(
+      "
+      create table if not exists `joins_group` (
+      `user_id` int not null,
+      `group_id` int not null,
+      `is_admin` boolean not null,
+      FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
+      FOREIGN KEY (`group_id`) REFERENCES `group`(`id`)
+      );
+      "
+    );
+
+    // 8. receives_broadcast
+    $this->run(
+      "
+      create table if not exists `receives_broadcast` (
+      `broadcast_id` int not null,
+      `receiver_id` int not null,
+      FOREIGN KEY (`broadcast_id`) REFERENCES `broadcast`(`id`),
+      FOREIGN KEY (`receiver_id`) REFERENCES `user`(`id`)
+      );
+      "
+    );
+
+    // 9. sends_group
+    $this->run(
+      "
+      create table if not exists `sends_group` (
+      `group_id` int not null,
+      `sender_id` int not null,
+      `message_id` int not null,
+      FOREIGN KEY (`group_id`) REFERENCES `group`(`id`),
+      FOREIGN KEY (`sender_id`) REFERENCES `user`(`id`),
+      FOREIGN KEY (`message_id`) REFERENCES `message`(`id`)
+      );
+      "
+    );
+
+    // 10. sends_broadcast
+    $this->run(
+      "
+      create table if not exists `sends_broadcast` (
+      `broadcast_id` int not null,
+      `message_id` int not null,
+      FOREIGN KEY (`broadcast_id`) REFERENCES `broadcast`(`id`),
+      FOREIGN KEY (`message_id`) REFERENCES `message`(`id`)
+      );
+      "
+    );
+
   }
 
   // @param $query SQL Query to run
