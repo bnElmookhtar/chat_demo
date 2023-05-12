@@ -23,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
 
       appBar: AppBar(
@@ -78,6 +77,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
     );
   }
+  //searching button functions
   Widget buildSearchField() {
     return TextField(
       controller: searchQueryController,

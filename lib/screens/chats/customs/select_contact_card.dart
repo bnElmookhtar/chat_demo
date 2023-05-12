@@ -73,9 +73,9 @@ class _BottomCardState extends State<BottomCard> {
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         radius: 25.0,
-        child: Icon(Icons.person),
+        child: Icon(Icons.person,size : 30),
+        ),
 
-      )
     );
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/groups_model.dart';
 import 'package:goat/screens/chats/customs/custom_group.dart';
-import '../screens/chats.dart';
+import 'package:goat/screens/chats/screens/group_particibate.dart';
 class SelectGroup extends StatefulWidget {
   const SelectGroup({Key? key}) : super(key: key);
 
@@ -130,7 +130,7 @@ class _BottomCardState extends State<BottomCard> {
   Widget build(BuildContext context) {
     return ListTile(
         onTap: (){
-          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const Chats()),);
+          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const NewGroupParticipate()),);
         },
         title: const Text(
           "New Group",

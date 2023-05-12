@@ -17,7 +17,7 @@ class CustomUser extends StatelessWidget {
           ListTile(
             title: Text(chatModel.name),
             subtitle: Text(chatModel.lastMsg),
-            leading: Icon(Icons.person),
+            leading: CircleAvatar(child:Icon(Icons.person) ,),
             trailing: Text(chatModel.time),
 
           )
