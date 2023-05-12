@@ -20,14 +20,24 @@ class _SelectGroupState extends State<SelectGroup> {
     GroupModel(name: "arch", icon: "icon", lastMsg: "lastMsg", time: "time"),
 
   ];
+  var searchQueryController = TextEditingController();
+  bool isSearching = false;
+  String searchQuery = "Search query";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        title:const Text("Select Group"),
-        actions: const [
-          Icon(Icons.search_rounded),
-        ],
+          leading: Container(),
+          title: isSearching ? buildSearchField() : const Text("Select Group"),
+          actions: isSearching ? buildActions() : [
+            ElevatedButton(
+              onPressed: (){
+                  startSearch();
+              },
+              child: Icon(Icons.search,size: 30.0,),
+            ),
+          ],
       ),
       body: ListView.builder(
           itemCount: groups.length,
@@ -44,6 +54,68 @@ class _SelectGroupState extends State<SelectGroup> {
           }
       ),
     );
+  }
+  Widget buildSearchField() {
+    return TextField(
+      controller: searchQueryController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: "Search for chat...",
+        border: InputBorder.none,
+        hintStyle: TextStyle(color: Colors.white30),
+      ),
+      style: TextStyle(color: Colors.white, fontSize: 16.0),
+     // onChanged: (query) => updateSearchQuery(query),
+    );
+  }
+  List<Widget> buildActions() {
+    if (isSearching) {
+      return <Widget>[
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            if (searchQueryController == null ||
+                searchQueryController.text.isEmpty) {
+              Navigator.pop(context);
+              return;
+            }
+            clearSearchQuery();
+          },
+        ),
+      ];
+    }
+
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: startSearch,
+      ),
+    ];
+  }
+  void startSearch() {
+    ModalRoute.of(context)!.addLocalHistoryEntry(LocalHistoryEntry(onRemove: startSearch),);
+    setState(() {
+      isSearching = true;
+    });
+  }
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+  }
+  void stopSearching() {
+    clearSearchQuery();
+
+    setState(() {
+      isSearching = false;
+    });
+  }
+  void clearSearchQuery() {
+    setState(() {
+      searchQueryController.clear();
+      updateSearchQuery("");
+      isSearching = false;
+    });
   }
 }
 class BottomCard extends StatefulWidget {
@@ -72,9 +144,9 @@ class _BottomCardState extends State<BottomCard> {
           foregroundColor: Colors.white,
           radius: 25.0,
           child: Icon(Icons.group),
-
         )
     );
   }
+
 }
 

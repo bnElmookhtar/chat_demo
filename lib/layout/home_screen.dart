@@ -11,7 +11,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin{
-  TabController? _controller; 
+  TabController? _controller;
+  var searchQueryController = TextEditingController();
+  bool isSearching = false;
+  String searchQuery = "Search query";
   @override
   void initState() {
     // TODO: implement initState
@@ -20,15 +23,25 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
+
+    return Scaffold(
+
       appBar: AppBar(
-        title: const Text("GOAT"),
-        actions: [
-          IconButton(onPressed: (){}, icon:const Icon(Icons.search_rounded,size: 30.0,),),
+        leading: Container(),
+        title: isSearching ? buildSearchField() : const Text("GOAT"),
+        actions: isSearching ? buildActions() : [
+          IconButton(onPressed: () {
+            setState(() {
+              startSearch();
+            });
+          },
+            icon: const Icon(Icons.search_rounded, size: 30.0,),),
           PopupMenuButton<String>(
-           onSelected: (value)=>debugPrint(value),
-             itemBuilder: (itemBuilder)=>[
-                PopupMenuItem(value: "settings",child:  Text("settings"), onTap: (){
+              onSelected: (value) => debugPrint(value),
+              itemBuilder: (itemBuilder) =>
+              [
+                PopupMenuItem(
+                    value: "settings", child: Text("settings"), onTap: () {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     Navigator.push(
                       context,
@@ -40,13 +53,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     );
                   });
                 }),
-              const PopupMenuItem(value: "started message",child: Text("started messages"),),
-         ]),
+                const PopupMenuItem(
+                  value: "started message", child: Text("started messages"),),
+              ]),
         ],
-        bottom:   TabBar(
+        bottom: TabBar(
           controller: _controller,
           indicatorColor: blk_200,
-          labelStyle:  const TextStyle(fontSize: 20.0),
+          labelStyle: const TextStyle(fontSize: 20.0),
           tabs: const [
             Tab(text: "Broadcast",),
             Tab(text: "CHATS"),
@@ -63,5 +77,67 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ],
       ),
     );
+  }
+  Widget buildSearchField() {
+    return TextField(
+      controller: searchQueryController,
+      autofocus: true,
+      decoration: InputDecoration(
+        hintText: "Search for chat...",
+        border: InputBorder.none,
+        hintStyle: TextStyle(color: Colors.white30),
+      ),
+      style: TextStyle(color: Colors.white, fontSize: 16.0),
+      onChanged: (query) => updateSearchQuery(query),
+    );
+  }
+  List<Widget> buildActions() {
+    if (isSearching) {
+      return <Widget>[
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            if (searchQueryController == null ||
+                searchQueryController.text.isEmpty) {
+              Navigator.pop(context);
+              return;
+            }
+            clearSearchQuery();
+          },
+        ),
+      ];
+    }
+
+    return <Widget>[
+      IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: startSearch,
+      ),
+    ];
+  }
+  void startSearch() {
+    ModalRoute.of(context)!.addLocalHistoryEntry(LocalHistoryEntry(onRemove: startSearch),);
+    setState(() {
+      isSearching = true;
+    });
+  }
+  void updateSearchQuery(String newQuery) {
+    setState(() {
+      searchQuery = newQuery;
+    });
+  }
+  void stopSearching() {
+    clearSearchQuery();
+
+    setState(() {
+      isSearching = false;
+    });
+  }
+  void clearSearchQuery() {
+    setState(() {
+      searchQueryController.clear();
+      updateSearchQuery("");
+      isSearching = false;
+    });
   }
 }
