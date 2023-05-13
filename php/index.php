@@ -24,7 +24,7 @@ try {
   } 
 
   //////////////////////////////////////////////////////
-  elseif ($q == "register") {
+  if ($q == "register") {
 
     $phone = $_POST["phone"];
     $name = $_POST["name"];
@@ -49,6 +49,22 @@ try {
   }
 
   //////////////////////////////////////////////////////
+  if ($q == "chats") {
+
+    $phone = $_POST["user_id"];
+
+    $results = $db->run(sprintf(
+      "
+      select `user`.`name` as `sender_name`, `message`.`text` as `last_message`, `message`.`timestamp` as `timestamp`
+      from `sends_user`, `message`, `user`
+      where `receiver_id` = %s and `message_id` = `message`.`id` and `user`.`id` = `sender_id`
+      group by `sender_id`  
+      ORDER BY `message`.`timestamp` DESC;
+      ",
+      $_POST["phone"]));
+
+    done($results);
+  }
 
   // only on debug
   done($db->run("select * from user"));
