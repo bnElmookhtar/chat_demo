@@ -18,25 +18,38 @@ class _SettingsState extends State<Settings> {
       appBar: AppBar(
         title: Text("Settings"),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
+      body: Container(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            defualtVersticalSizedBox(height: 15.0),
             ListTile(
-              title: Text("user name"),
+              title: Text("Change Phone Number"),
               leading: const CircleAvatar(
                 radius: 30.0,
-                child: Icon(Icons.person),
+                child: Icon(Icons.phone_outlined),
               ),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (builder)=>ChangePhone(),),);
+              },
+            ),
+            defualtVersticalSizedBox(height: 15.0),
+            ListTile(
+              title: Text("Change my name"),
+              leading: const CircleAvatar(
+                radius: 30.0,
+                child: Icon(Icons.person_outlined,size: 30,),
+              ),
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (builder)=>ChangeName(),),);
+              },
             ),
             defualtVersticalSizedBox(height: 15.0),
             ListTile(
               title: Text("Delete my account"),
               leading: const CircleAvatar(
                 radius: 30.0,
-                child: Icon(Icons.delete_forever),
+                child: Icon(Icons.delete_forever_outlined),
               ),
               onTap: () {
                 //sql function to delete account without any warning
@@ -48,32 +61,10 @@ class _SettingsState extends State<Settings> {
             ),
             defualtVersticalSizedBox(height: 15.0),
             ListTile(
-              title: Text("Change Phone Number"),
+              title: Text("About GOAT messenger"),
               leading: const CircleAvatar(
                 radius: 30.0,
-                child: Icon(Icons.phone),
-              ),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (builder)=>ChangePhone(),),);
-              },
-            ),
-            defualtVersticalSizedBox(height: 15.0),
-            ListTile(
-              title: Text("Change User Name"),
-              leading: const CircleAvatar(
-                radius: 30.0,
-                child: Icon(Icons.drive_file_rename_outline_outlined,size: 30,),
-              ),
-              onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (builder)=>ChangeName(),),);
-              },
-            ),
-            defualtVersticalSizedBox(height: 15.0),
-            ListTile(
-              title: Text("Help"),
-              leading: const CircleAvatar(
-                radius: 30.0,
-                child: Icon(Icons.help_outline_outlined,size: 30,),
+                child: Icon(Icons.info_outlined,size: 30,),
               ),
               onTap: (){ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("I cant help you ")));},
             ),
