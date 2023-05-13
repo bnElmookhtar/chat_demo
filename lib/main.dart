@@ -10,10 +10,11 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home:  HomeScreen(userId: "Ddd"),
-    // return MaterialApp(
-    //   home: SignIn(),
+    return MaterialApp(
+      theme: ThemeData.from(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      home:  HomeScreen(),
+      // return MaterialApp(
+      //   home: SignIn(),
       debugShowCheckedModeBanner:false,
     );
   }

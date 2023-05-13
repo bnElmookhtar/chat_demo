@@ -1,10 +1,10 @@
 class ChatModel
 {
-  String name,icon,lastMsg,time;
+  String? id, name, last_message, timestamp;
   ChatModel({
+    required this.id,
     required this.name,
-    required this.icon,
-    required this.lastMsg,
-    required this.time
+    required this.last_message,
+    required this.timestamp
 });
 }

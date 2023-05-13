@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/groups_model.dart';
 import 'package:goat/screens/chats/customs/custom_group.dart';
-import 'package:goat/screens/chats/screens/group_particibate.dart';
+import 'package:goat/screens/chats/group_particibate.dart';
 class SelectGroup extends StatefulWidget {
   const SelectGroup({Key? key}) : super(key: key);
 

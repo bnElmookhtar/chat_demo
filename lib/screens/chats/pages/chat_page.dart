@@ -13,7 +13,6 @@ class _ChatPageState extends State<ChatPage> {
   var searchTerm = "";
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     newMessage.addListener(() { });
   }
@@ -21,7 +20,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chatModel.name),
+        title: Text(widget.chatModel.name ?? ""),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/chats_model.dart';
 import 'package:goat/screens/chats/pages/chat_page.dart';
+
+
 class CustomUser extends StatelessWidget {
-   CustomUser({Key? key,required this.chatModel}) : super(key: key);
+  CustomUser({Key? key,required this.chatModel}) : super(key: key);
   final ChatModel chatModel;
   String userName = "karim";
 
@@ -15,11 +17,10 @@ class CustomUser extends StatelessWidget {
       child: Column(
         children: [
           ListTile(
-            title: Text(chatModel.name),
-            subtitle: Text(chatModel.lastMsg),
-            leading: CircleAvatar(child:Icon(Icons.person) ,),
-            trailing: Text(chatModel.time),
-
+            title: Text(chatModel.name ?? ""),
+            subtitle: Text(chatModel.last_message ?? ""),
+            leading: CircleAvatar(child: Text(chatModel.name?.substring(0,2) ?? ""),),
+            trailing: Text(chatModel.timestamp ?? ""),
           )
         ],
       ),

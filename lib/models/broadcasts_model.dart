@@ -1,7 +1,7 @@
-class BroadcastModel
+class BroadcastsModel
 {
   String broadName,lastMsg,time;
-  BroadcastModel({
+  BroadcastsModel({
     required this.broadName,
     required this.lastMsg,
     required this.time

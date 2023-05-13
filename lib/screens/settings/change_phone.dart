@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/component/reusable_component.dart';
 class ChangePhone extends StatefulWidget {
-  final String? id ;
-  const ChangePhone({Key? key,this.id}) : super(key: key);
+  const ChangePhone({Key? key}) : super(key: key);
   @override
   State<ChangePhone> createState() => _ChangePhone();
 }
