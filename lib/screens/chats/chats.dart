@@ -1,49 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:goat/screens/chats/customs/select_contact_card.dart';
-import 'package:goat/screens/chats/customs/custom_user.dart';
-import 'package:goat/models/chats_model.dart';
+import 'package:goat/screens/chats/pages/chat_page.dart';
+import 'package:goat/screens/chats/pages/contacts_page.dart';
+import 'package:goat/server/request.dart';
+import 'package:goat/server/session.dart';
 class Chats extends StatefulWidget {
-  final String? userId ;
-  const Chats({Key? key,this.userId}) : super(key: key);
+  const Chats({Key? key}) : super(key: key);
 
   @override
   State<Chats> createState() => _ChatsState();
 }
 
 class _ChatsState extends State<Chats> {
-  List<Map<String, String>> chatsData = [
-  {"id": "?", "name": "Ahmed Abdullah", "last_message": "Welcome back!", "timestamp": "May 14 02:01 AM" },
-  {"id": "?", "name": "Ahmed Abdullah", "last_message": "Welcome back!", "timestamp": "May 14 02:01 AM" },
-  ];
-  List<ChatModel> chats = [];
-// [
-//     ChatModel(name: "karim", icon: "icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "mohamed", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "youssef", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "ali", icon: "icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "nany", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "taha", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "awis", icon: "icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "lamy", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//     ChatModel(name: "radwa", icon: "Icon", lastMsg: "lastMsg", time: "time"),
-//   ];
+  var items = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    request(context, 
+    {"q":"chats", "user_id": Session.userId}
+    ).then((ls) { setState((){ items = ls; });});
+  }
+
   @override
   Widget build(BuildContext context) {
-    for (final i in chatsData) {
-    chats.add(ChatModel(id: i["id"], name: i["name"], 
-      last_message: i["last_message"], timestamp: i["timestamp"]));
-  }
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const SelectContact()));
-        },
-        child: const Icon(Icons.message),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ContactsPage(),
+            ),
+          );
+        }, 
+        child: Icon(Icons.contacts_outlined),
       ),
-      body: ListView.builder(itemBuilder: (context,index)=>CustomUser(chatModel: chats[index],),itemCount: chats.length,)
+      body: Padding( 
+        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+        child: 
+        ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text(items[index]["name"].toString().substring(0, 2)),
+              ),
+              title: Text(items[index]["name"]),
+              subtitle: Text(items[index]["last_message"]),
+              trailing: Text(items[index]["timestamp"].replaceFirst(" ", "\n")),
+              onTap: () {
+                Session.selectedId = items[index]["id"].toString();
+                Session.selectedName = items[index]["name"];
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatPage(),
+                  ),
+                );
+                            },
+            );
+          },
+        ),
+      )
     );
   }
 
-
-  
 }

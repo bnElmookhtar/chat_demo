@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/broadcasts_model.dart';
-class BroadcastsPage extends StatefulWidget {
-  const BroadcastsPage({Key? key, required this.broadcastModel}) : super(key: key);
+class BroadcastPage extends StatefulWidget {
+  const BroadcastPage({Key? key, required this.broadcastModel}) : super(key: key);
   final BroadcastsModel broadcastModel;
   @override
-  State<BroadcastsPage> createState() => _BroadcastsPage();
+  State<BroadcastPage> createState() => _BroadcastPage();
 }
 
-class _BroadcastsPage extends State<BroadcastsPage> {
+class _BroadcastPage extends State<BroadcastPage> {
   @override
   void initState() {
     super.initState();

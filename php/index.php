@@ -8,7 +8,18 @@ try {
   $q = $_POST["q"];
 
   //////////////////////////////////////////////////////
-  if ($q == "login") {
+  if ($q == "contacts") {
+
+    $results = $db->run(sprintf("select * from user where id <> %s", $_POST["user_id"]));
+
+    if (count($results) == 0) 
+      error("No contacts other than you");
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "sign_in") {
 
     $phone = $_POST["phone"];
 
@@ -24,7 +35,7 @@ try {
   } 
 
   //////////////////////////////////////////////////////
-  if ($q == "register") {
+  if ($q == "sign_up") {
 
     $phone = $_POST["phone"];
     $name = $_POST["name"];
@@ -51,20 +62,115 @@ try {
   //////////////////////////////////////////////////////
   if ($q == "chats") {
 
-    $phone = $_POST["user_id"];
+    $results = $db->run(sprintf("      
+      SELECT sender_id+receiver_id-%s as id, name, text as last_message, timestamp
+      FROM sends_user as s1
+      JOIN message ON message.id = s1.message_id
+      JOIN user ON user.id = sender_id+receiver_id-%s
+      WHERE (s1.sender_id=%s OR s1.receiver_id=%s) AND s1.message_id = (
+      SELECT MAX(message_id)
+      FROM sends_user as s2
+      WHERE (s2.sender_id=s1.sender_id AND s2.receiver_id=s1.receiver_id) OR
+      (s2.sender_id=s1.receiver_id AND s2.receiver_id=s1.sender_id)
+      )
+      ", $_POST["user_id"], $_POST["user_id"], $_POST["user_id"], $_POST["user_id"]));
 
-    $results = $db->run(sprintf(
-      "
-      select `user`.`name` as `sender_name`, `message`.`text` as `last_message`, `message`.`timestamp` as `timestamp`
-      from `sends_user`, `message`, `user`
-      where `receiver_id` = %s and `message_id` = `message`.`id` and `user`.`id` = `sender_id`
-      group by `sender_id`  
-      ORDER BY `message`.`timestamp` DESC;
-      ",
-      $_POST["phone"]));
+    if (count($results) == 0) 
+      error("No messages found");
 
     done($results);
   }
+
+   //////////////////////////////////////////////////////
+  if ($q == "groups") {
+
+    $results = $db->run(sprintf("      
+      SELECT g.id as `id`, g.name as `name`, 
+      u.name as `sender_name`, m.text as `text`, m.timestamp as `timestamp`
+      FROM joins_group as jg
+      JOIN `group` as g 
+      ON g.id = jg.group_id
+      LEFT JOIN `sends_group` as sg
+      ON sg.group_id = g.id AND sg.message_id = (
+      SELECT MAX(sg2.message_id) 
+      FROM `sends_group` as sg2
+      WHERE sg2.group_id = g.id
+      )
+      LEFT JOIN `message` as m 
+      ON m.id = sg.message_id
+      LEFT JOIN `user` as u 
+      ON u.id = sg.sender_id
+      WHERE jg.user_id = %s
+      ORDER BY m.id;
+      ", $_POST["user_id"]));
+
+    if (count($results) == 0) 
+      error("No groups found");
+
+    done($results);
+  }
+
+
+  //////////////////////////////////////////////////////
+  if ($q == "group_page") {
+
+    $results = $db->run(sprintf("
+      SELECT u.id as sender_id, u.name as sender_name, m.text as text, m.timestamp as timestamp
+      FROM sends_group as sg 
+      JOIN user as u 
+      ON u.id = sg.sender_id
+      JOIN message as m 
+      ON m.id = sg.message_id
+      WHERE sg.group_id = %s
+      ORDER BY m.id;
+      ", $_POST["selected_id"]));
+
+    if (count($results) == 0) 
+      error("No messages found");
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "chat_page") {
+
+    $results = $db->run(sprintf("
+      SELECT sender_id, text, timestamp
+      FROM sends_user
+      JOIN message ON message.id = message_id
+      WHERE sender_id=%s AND receiver_id=%s OR sender_id=%s AND receiver_id=%s
+      ORDER BY message_id 
+      ", $_POST["user_id"], $_POST["selected_id"], $_POST["selected_id"], $_POST["user_id"]));
+
+    if (count($results) == 0) 
+      error("No messages found");
+
+    done($results);
+  }
+  
+  //////////////////////////////////////////////////////
+  if ($q == "sends_user") {
+
+    $results = $db->run(sprintf("
+      INSERT INTO message(text) VALUES ('%s');
+      INSERT INTO sends_user(sender_id, receiver_id, message_id) VALUES (%s, %s, LAST_INSERT_ID());
+      ", $_POST["text"], $_POST["user_id"], $_POST["selected_id"]));
+
+    done();
+  }
+
+  
+  //////////////////////////////////////////////////////
+  if ($q == "sends_group") {
+
+    $results = $db->run(sprintf("
+      INSERT INTO message(text) VALUES ('%s');
+      INSERT INTO sends_group(sender_id, group_id, message_id) VALUES (%s, %s, LAST_INSERT_ID());
+      ", $_POST["text"], $_POST["user_id"], $_POST["selected_id"]));
+
+    done();
+  }
+
 
   // only on debug
   done($db->run("select * from user"));
@@ -80,7 +186,7 @@ function error($msg)
   die(sprintf('[{"error":"%s"}]', $msg));
 }
 
-function done($arrayOfMaps)
+function done($arrayOfMaps=[[""=>""]])
 {
   die(json_encode($arrayOfMaps));
 }

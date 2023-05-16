@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:goat/layout/home_screen.dart';
 import 'package:goat/screens//register/sign_up.dart';
 import 'package:goat/component/reusable_component.dart';
 import 'package:goat/server/request.dart';
+import 'package:goat/server/session.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -16,76 +18,71 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadiusDirectional.only(
-              bottomEnd: Radius.circular(25), bottomStart: Radius.circular(25)),
-        ),
-        title: const Text("WELCOME IN SIGNIN PAGE "),
-      ),
       body: SingleChildScrollView(
-          child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            defualtVersticalSizedBox(height: 40.0),
-            defualtText(
-              txt: "SIGNIN",
-              fontwit: FontWeight.bold,
-            ),
-            defualtVersticalSizedBox(height: 40.0),
-            TextFormField(
-              onTap: () {},
-              decoration: const InputDecoration(
-                label: Text("Phone Number"),
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
-              ),
-
-              controller: phoneNum,
-              keyboardType: TextInputType.phone,
-              onFieldSubmitted: (value) {},
-            ),
-            MaterialButton(
-              onPressed: ()async {
-                final String phone = phoneNum.text.trim();
-                request(context, {
-                  "q": "login",
-                  "phone": phone,
-                }).then((ls) {
-                  if (ls != null) {
-                    final userId = ls[0]["id"];
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (builder) => HomeScreen()));
-                  }
-                });
-              },
-              color: Colors.blue,
-              minWidth: double.infinity,
-              child: const Text("Sign In"),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text("dont have an account ? "),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SignUp(),
-                        ));
-                  },
-                  child: const Text("create one"),
+        child: Padding(
+          padding: const EdgeInsets.all(50.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(Icons.login_outlined, size: 30, color: Colors.grey,),
+              SizedBox(height: 30,),
+              Text("Welcome on"),
+              Text(
+                "GOAT Messanger", 
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
-              ],
-            )
-          ],
-        ),
-      )),
+              ),
+              SizedBox(height: 80),
+              TextFormField(
+                onTap: () {},
+                decoration: const InputDecoration(
+                  label: Text("Phone Number"),
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.phone),
+                ),
+
+                controller: phoneNum,
+                keyboardType: TextInputType.number,
+                onFieldSubmitted: (value) {},
+                maxLength: 11,
+                maxLines: 1,
+              ),
+              SizedBox(height: 30,),
+              ElevatedButton(
+                onPressed: (){
+                  final String phone = phoneNum.text.trim();
+                  request(context, {
+                    "q": "sign_in",
+                    "phone": phone,
+                  }).then((ls) {
+                    if (ls != null) {
+                      Session.userId = ls[0]["id"].toString();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => HomeScreen()));
+                    }
+                  });
+                },
+                child: const Text("LOGIN"),
+              ),
+              SizedBox(height: 90,),
+              Text("Haven't registered yet?"),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SignUp(),
+                    ));
+                },
+                child: const Text("Create Account"),
+              ),
+            ],
+          ),
+        )),
     );
   }
 }

@@ -19,7 +19,7 @@ Future request(BuildContext context, Map<String, String> body) async {
     return results;
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Could not connect')),
+      SnackBar(content: Text('Could not connect\n' + e.toString())),
     );
     return null;
   }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:goat/models/broadcasts_model.dart';
-import 'package:goat/screens/chats/customs/custom_broadcasts_card.dart';
-import 'package:goat/screens/chats/customs/select_contact_card.dart';
 
 class Broadcasts extends StatefulWidget {
   final String? userId ;
@@ -24,11 +22,11 @@ class _Broadcasts extends State<Broadcasts> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.push(context,MaterialPageRoute(builder: (builder)=>const SelectContact()));
+          // Navigator.push(context,MaterialPageRoute(builder: (builder)=>const SelectContact()));
         },
         child: const Icon(Icons.add),
       ),
-     body: ListView.builder(itemBuilder: (context,index)=>CustomBroadcastsCard(broadmodel: broadModel[index]),itemCount: broadModel.length,)
+     // body: ListView.builder(itemBuilder: (context,index)=>CustomBroadcastsCard(broadmodel: broadModel[index]),itemCount: broadModel.length,)
     );
   }
 }
