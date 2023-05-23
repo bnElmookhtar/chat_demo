@@ -8,12 +8,145 @@ try {
   $q = $_POST["q"];
 
   //////////////////////////////////////////////////////
+  if ($q == "user") {
+
+    $results = $db->run(sprintf("select * from user where id = %s", $_POST["user_id"]));
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "delete_user") {
+
+    // TODO: 
+
+    done();
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "delete_broadcast") {
+
+    // TODO: 
+
+    done();
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "delete_group") {
+
+    // TODO: 
+
+    done();
+  }
+
+  
+  //////////////////////////////////////////////////////
+  if ($q == "delete_group_member") {
+
+    // TODO: 
+
+    done();
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "admin_group_member") {
+
+    // TODO:
+
+    done();
+  }
+
+   //////////////////////////////////////////////////////
+  if ($q == "unadmin_group_member") {
+
+    // TODO:
+
+    done();
+  }
+
+     //////////////////////////////////////////////////////
+  if ($q == "delete_broadcast_receiver") {
+
+    // TODO:
+
+    done();
+  }
+
+
+  //////////////////////////////////////////////////////
   if ($q == "contacts") {
 
     $results = $db->run(sprintf("select * from user where id <> %s", $_POST["user_id"]));
 
     if (count($results) == 0) 
       error("No contacts other than you");
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "create_group") {
+    if (strlen($_POST["name"]) == 0) 
+    error("Name field is empty");
+
+    if (strlen($_POST["ids"]) == 0)
+    error("No users were selected");
+
+    $query = sprintf("
+      INSERT INTO `group`(name) VALUES ('%s');
+      INSERT INTO `joins_group` VALUES 
+      (%s, LAST_INSERT_ID(), true)
+      ", $_POST["name"], $_POST["user_id"]);
+
+    $parts = explode(" ", $_POST["ids"]);
+    foreach ($parts as $part) {
+      if (strlen($part) != 0) {
+        $query .= sprintf(",(%s, LAST_INSERT_ID(), false)", $part);
+      }
+    }
+
+    $results = $db->run($query);
+    $results = $db->run(" 
+      SELECT id, name
+      FROM `group`
+      ORDER BY id DESC
+      LIMIT 1
+      ");
+
+    done($results);
+  }
+
+
+  //////////////////////////////////////////////////////
+  if ($q == "create_broadcast") {
+    if (strlen($_POST["ids"]) == 0)
+    error("No users were selected");
+
+    $query = sprintf("
+      INSERT INTO broadcast(sender_id) VALUES (%s);
+      INSERT INTO receives_broadcast VALUES 
+      ", $_POST["user_id"]);
+
+    $parts = explode(" ", $_POST["ids"]);
+    foreach ($parts as $index => $part) {
+      if (strlen($part) != 0) {
+        if ($index > 0) {
+          $query .= ",";
+        }
+        $query .= sprintf("(LAST_INSERT_ID(), %s)", $part);
+      }
+    }
+
+    $results = $db->run($query);
+    $results = $db->run(" 
+      SELECT rb.broadcast_id AS id, u.name 
+      FROM user AS u
+      JOIN receives_broadcast AS rb
+        ON u.id = rb.receiver_id AND rb.broadcast_id =(
+          SELECT MAX(b.id)
+          FROM broadcast AS b 
+        )
+      ");
 
     done($results);
   }
@@ -60,6 +193,46 @@ try {
   }
 
   //////////////////////////////////////////////////////
+  if ($q == "update_name") {
+    $name = $_POST["name"];
+
+    if (strlen($name) >= 30 || strlen($name) < 2) 
+    error("Empty name field or not in range 2..29 letters");
+
+    $results = $db->run(sprintf(" 
+      UPDATE user 
+      SET name = '%s'
+      WHERE id = %s;
+      ", 
+      $_POST["name"], $_POST["user_id"]));
+
+    done();
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "update_phone") {
+
+    $phone = $_POST["phone"];
+
+    if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
+      error("Invalid or not a phone number");
+
+    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+
+    if (count($results) != 0) 
+    error("That phone is used by someone else");
+
+    $results = $db->run(sprintf(" 
+      UPDATE user 
+      SET phone = '%s'
+      WHERE id = %s;
+      ", 
+      $_POST["phone"], $_POST["user_id"]));
+
+    done();
+  }
+
+  //////////////////////////////////////////////////////
   if ($q == "chats") {
 
     $results = $db->run(sprintf("      
@@ -73,10 +246,41 @@ try {
       WHERE (s2.sender_id=s1.sender_id AND s2.receiver_id=s1.receiver_id) OR
       (s2.sender_id=s1.receiver_id AND s2.receiver_id=s1.sender_id)
       )
+      ORDER BY message.id DESC
       ", $_POST["user_id"], $_POST["user_id"], $_POST["user_id"], $_POST["user_id"]));
 
     if (count($results) == 0) 
       error("No messages found");
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "broadcasts") {
+
+    $results = $db->run(sprintf("      
+      SELECT b.id, m.text as last_message, m.timestamp, u.name
+      FROM broadcast AS b
+      LEFT JOIN sends_broadcast AS sb
+              ON sb.message_id = (
+                      SELECT MAX(sb2.message_id)
+                      FROM sends_broadcast AS sb2
+                      WHERE sb2.broadcast_id = b.id
+              )
+      LEFT JOIN message as m 
+              ON m.id = sb.message_id
+      LEFT JOIN user as u 
+              ON u.id IN (
+              SELECT rb.receiver_id 
+              FROM receives_broadcast as rb
+              WHERE rb.broadcast_id = b.id
+          )
+      WHERE b.sender_id = %s
+      ORDER BY m.id DESC;
+      ", $_POST["user_id"]));
+
+    if (count($results) == 0) 
+      error("No broadcasts found");
 
     done($results);
   }
@@ -101,7 +305,7 @@ try {
       LEFT JOIN `user` as u 
       ON u.id = sg.sender_id
       WHERE jg.user_id = %s
-      ORDER BY m.id;
+      ORDER BY m.id DESC;
       ", $_POST["user_id"]));
 
     if (count($results) == 0) 
@@ -147,6 +351,23 @@ try {
 
     done($results);
   }
+
+  //////////////////////////////////////////////////////
+  if ($q == "broadcast_page") {
+
+    $results = $db->run(sprintf("
+      SELECT m.text, m.timestamp
+      FROM sends_broadcast as sb
+      JOIN message as m ON m.id = sb.message_id
+      WHERE broadcast_id = %s
+      ORDER BY m.id
+      ", $_POST["selected_id"]));
+
+    if (count($results) == 0) 
+      error("No messages found");
+
+    done($results);
+  }
   
   //////////////////////////////////////////////////////
   if ($q == "sends_user") {
@@ -159,6 +380,31 @@ try {
     done();
   }
 
+  
+  //////////////////////////////////////////////////////
+  if ($q == "sends_broadcast") {
+
+    $results = $db->run(sprintf("
+      INSERT INTO message(text) VALUES ('%s');
+      INSERT INTO sends_broadcast VALUES (%s, LAST_INSERT_ID());
+      ", $_POST["text"], $_POST["selected_id"]));
+
+    $results = $db->run(sprintf("
+      INSERT INTO sends_user
+      SELECT u.id, %s, (
+        SELECT MAX(m.id)
+        FROM message AS m
+      )
+      FROM user AS u
+      WHERE u.id IN(
+        SELECT rb.receiver_id
+        FROM receives_broadcast AS rb
+        WHERE rb.broadcast_id = %s
+      )
+      ", $_POST["user_id"], $_POST["selected_id"]));
+
+    done();
+  }
   
   //////////////////////////////////////////////////////
   if ($q == "sends_group") {

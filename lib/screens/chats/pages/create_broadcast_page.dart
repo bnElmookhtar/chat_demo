@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:goat/screens/chats/pages/group_page.dart';
+import 'package:goat/screens/chats/pages/broadcast_page.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
 
-class CreateGroupPage extends StatefulWidget {
-  const CreateGroupPage({Key? key}) : super(key: key);
+class CreateBroadcastPage extends StatefulWidget {
+  const CreateBroadcastPage({Key? key}) : super(key: key);
   @override
-  State<CreateGroupPage> createState() => _CreateGroupPageState();
+  State<CreateBroadcastPage> createState() => _CreateBroadcastPageState();
 }
 
-class _CreateGroupPageState extends State<CreateGroupPage> {
-  var nameControler = TextEditingController();
+class _CreateBroadcastPageState extends State<CreateBroadcastPage> {
   var items = [];
 
   @override
@@ -21,7 +20,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       {"q":"contacts", "user_id": Session.userId}
       ).then((ls) { setState((){ items = ls; });});
     }
-    nameControler.addListener(() { });
   }
 
   @override
@@ -29,7 +27,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: Text("Create Group"),
+        title: Text("Create Broadcast"),
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -38,16 +36,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
           padding: EdgeInsets.fromLTRB(20, 30, 20, 20), 
           child: Column(
             children: [
-              TextField( 
-                keyboardType: TextInputType.text,
-                maxLines: 1,
-                maxLength: 29,
-                controller: nameControler,
-                decoration: InputDecoration(
-                  hintText: 'Group Name',
-                ),
-              ),
-              SizedBox(height: 30,),
               Text("Selected ${items.where((element) => element["choosen"] == true).length} users"),
               SizedBox(height: 20,),
               Expanded(
@@ -76,7 +64,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               SizedBox(height: 20,),
               ElevatedButton(
                 onPressed: (){
-                  final name = nameControler.text.toString().trim().replaceAll("'", "''");
                   String ids = "";
                   for (var item in items) {
                     if (item["choosen"] == true) {
@@ -84,19 +71,21 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     }
                   }
                   request(context, {
-                    "q": "create_group",
-                    "name": name,
+                    "q": "create_broadcast",
                     "user_id": Session.userId,
                     "ids": ids,
                   }).then((ls) {
                     if (ls != null) {
                       Session.selectedId = ls[0]["id"].toString();
                       Session.selectedName = ls[0]["name"];
+                      for (int i = 1; i < ls.length; i++) {
+                         Session.selectedName += ', ${ls[i]["name"]}';
+                      }
                       Navigator.pop(context);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => GroupPage(),
+                          builder: (context) => BroadcastPage(),
                         ),
                       );
                     }

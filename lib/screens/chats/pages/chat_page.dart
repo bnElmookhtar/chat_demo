@@ -16,7 +16,7 @@ class _ChatPageState extends State<ChatPage> {
   void refresh(){
     request(context, 
     {"q":"chat_page", "user_id": Session.userId, "selected_id": Session.selectedId}
-    ).then((ls) { setState((){ if (ls != null) items = ls; }); _scrollToEnd();});
+    ).then((ls) { setState((){ if (ls != null) items = ls; });});
   }
 
   @override
@@ -37,6 +37,7 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    Future.delayed(Duration.zero, (){ _scrollToEnd(); });
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(

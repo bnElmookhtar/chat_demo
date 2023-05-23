@@ -34,7 +34,7 @@ class _ChatsState extends State<Chats> {
             ),
           );
         }, 
-        child: Icon(Icons.contacts_outlined),
+        child: Icon(Icons.search),
       ),
       body: Padding( 
         padding: EdgeInsets.fromLTRB(0, 10, 0, 0),

@@ -21,6 +21,7 @@ Future request(BuildContext context, Map<String, String> body) async {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Could not connect\n' + e.toString())),
     );
+    print(e.toString());
     return null;
   }
 }
