@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goat/screens/chats/pages/broadcast_page.dart';
 import 'package:goat/server/session.dart';
@@ -12,14 +13,29 @@ class CreateBroadcastPage extends StatefulWidget {
 class _CreateBroadcastPageState extends State<CreateBroadcastPage> {
   var items = [];
 
+
+  late Timer timer;
+
   @override
-  void initState() {
-    super.initState();
-    if (items.isEmpty) {
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+  void refresh() {
+     if (items.isEmpty) {
       request(context, 
       {"q":"contacts", "user_id": Session.userId}
       ).then((ls) { setState((){ items = ls; });});
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      refresh();
+    });
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goat/screens/chats/pages/group_page.dart';
 import 'package:goat/server/session.dart';
@@ -13,15 +14,29 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   var nameControler = TextEditingController();
   var items = [];
 
+  late Timer timer;
+
   @override
-  void initState() {
-    super.initState();
-    if (items.isEmpty) {
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  void refresh() {
+     if (items.isEmpty) {
       request(context, 
       {"q":"contacts", "user_id": Session.userId}
       ).then((ls) { setState((){ items = ls; });});
     }
-    nameControler.addListener(() { });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      refresh();
+    });
   }
 
   @override

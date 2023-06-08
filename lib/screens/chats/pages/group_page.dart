@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goat/screens/chats/pages/group_settings.dart';
 import 'package:goat/screens/chats/pages/yes_no_dialog.dart';
@@ -24,11 +25,23 @@ class _GroupPageState extends State<GroupPage> {
     ).then((ls) { setState((){ Session.isAdmin = ls[0]["is_admin"].toString(); }); });
   }
 
+
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
+      refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      refresh();
+    });
     newMessage.addListener(() { });
-    refresh();
   }
 
   final ScrollController _scrollController = ScrollController();

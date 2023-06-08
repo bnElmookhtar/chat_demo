@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goat/screens/chats/pages/yes_no_dialog.dart';
 import 'package:goat/server/session.dart';
@@ -20,11 +21,22 @@ class _BroadcastPageState extends State<BroadcastPage> {
     ).then((ls) { setState((){ if (ls != null) items = ls; });});
   }
 
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
     newMessage.addListener(() { });
     refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      refresh();
+    });
   }
 
   final ScrollController _scrollController = ScrollController();

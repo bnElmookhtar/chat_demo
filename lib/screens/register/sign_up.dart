@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:goat/component/reusable_component.dart';
 import 'package:goat/server/request.dart';
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -28,7 +27,7 @@ class _SignUpState extends State<SignUp> {
               TextFormField(
                 onTap: () {},
                 decoration: InputDecoration(
-                  label: defualtText(txt: "Name",),
+                  label: Text( "Name",),
                   border: const OutlineInputBorder(),
                   prefixIcon: const Icon(Icons.person),
                 ),
@@ -73,7 +72,7 @@ class _SignUpState extends State<SignUp> {
                     }
                   });
                 },
-                child: defualtText(txt: "CREATE" ),
+                child: Text("CREATE" ),
               ),
             ],
           ),

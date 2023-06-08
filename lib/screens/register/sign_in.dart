@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:goat/layout/home_screen.dart';
 import 'package:goat/screens//register/sign_up.dart';
-import 'package:goat/component/reusable_component.dart';
 import 'package:goat/server/request.dart';
 import 'package:goat/server/session.dart';
 

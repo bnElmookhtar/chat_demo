@@ -5,6 +5,7 @@ import 'package:goat/screens/register/sign_in.dart';
 import 'package:goat/screens/register/sign_up.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
+import 'dart:async';
 
 class AccountSettingsPage extends StatefulWidget {
   const AccountSettingsPage({Key? key}) : super(key: key);
@@ -16,15 +17,27 @@ class _AccountSettingsPageState extends State<AccountSettingsPage> {
   var nameControler = TextEditingController();
   var phoneControler = TextEditingController();
   var items = [];
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
-    request(context, 
-    {"q":"user", "user_id": Session.userId}
-    ).then((ls) { setState((){ items = ls; });});
-    nameControler.addListener(() { });
+
+      request(context, 
+      {"q":"user", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls; });});
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      request(context, 
+      {"q":"user", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls; });});
+    });
+   nameControler.addListener(() { });
     phoneControler.addListener(() { });
+  }
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   @override

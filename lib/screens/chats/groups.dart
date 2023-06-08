@@ -3,6 +3,7 @@ import 'package:goat/screens/chats/pages/group_page.dart';
 import 'package:goat/screens/chats/pages/create_group_page.dart';
 import 'package:goat/server/request.dart';
 import 'package:goat/server/session.dart';
+import 'dart:async';
 class Groups extends StatefulWidget {
   const Groups({Key? key}) : super(key: key);
 
@@ -13,13 +14,26 @@ class Groups extends StatefulWidget {
 class _GroupsState extends State<Groups> {
   var items = [];
 
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
 
-    request(context, 
-    {"q":"groups", "user_id": Session.userId}
-    ).then((ls) { setState((){ items = ls;});});
+      request(context, 
+      {"q":"groups", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls;});});
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      request(context, 
+      {"q":"groups", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls;});});
+    });
   }
 
   @override

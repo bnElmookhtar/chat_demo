@@ -3,6 +3,7 @@ import 'package:goat/screens/chats/pages/chat_page.dart';
 import 'package:goat/screens/chats/pages/contacts_page.dart';
 import 'package:goat/server/request.dart';
 import 'package:goat/server/session.dart';
+import 'dart:async';
 class Chats extends StatefulWidget {
   const Chats({Key? key}) : super(key: key);
 
@@ -13,13 +14,26 @@ class Chats extends StatefulWidget {
 class _ChatsState extends State<Chats> {
   var items = [];
 
+
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-
-    request(context, 
-    {"q":"chats", "user_id": Session.userId}
-    ).then((ls) { setState((){ items = ls; });});
+      request(context, 
+      {"q":"chats", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls; });});
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      request(context, 
+      {"q":"chats", "user_id": Session.userId}
+      ).then((ls) { setState((){ items = ls; });});
+    });
   }
 
   @override

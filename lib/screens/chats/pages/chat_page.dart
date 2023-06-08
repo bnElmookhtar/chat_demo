@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
@@ -30,11 +31,23 @@ class _ChatPageState extends State<ChatPage> {
 
   }
 
+
+  late Timer timer;
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-    newMessage.addListener(() { });
     refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    refresh();
+    });
+    newMessage.addListener(() { });
   }
 
   final ScrollController _scrollController = ScrollController();

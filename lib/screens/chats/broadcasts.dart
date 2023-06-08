@@ -15,9 +15,15 @@ class Broadcasts extends StatefulWidget {
 class _BroadcastsState extends State<Broadcasts> {
   var items = [];
 
+  late Timer timer;
+
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  void refresh() {
     request(context, 
     {"q":"broadcasts", "user_id": Session.userId}
     ).then((ls) { setState((){ 
@@ -33,6 +39,15 @@ class _BroadcastsState extends State<Broadcasts> {
         items.add(ls[i]);
       }
     });
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refresh();
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      refresh();
     });
   }
 
