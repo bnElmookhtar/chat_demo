@@ -14,9 +14,11 @@ Future request(BuildContext context, Map<String, String> body) async {
     var results = json.decode(response.body);
     // print(results);
     if ( results[0].keys.contains("error") ) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(results[0]["error"])),
-      );
+      if ( results[0]["error"] != "No messages found" ) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(results[0]["error"])),
+        );
+      }
       return null;
     }
     return results;
