@@ -59,6 +59,7 @@ class _SignInState extends State<SignIn> {
                   }).then((ls) {
                     if (ls != null) {
                       Session.userId = ls[0]["id"].toString();
+                      Session.userName = ls[0]["name"].toString();
                       Navigator.pop(context);
                       Navigator.push(
                         context,

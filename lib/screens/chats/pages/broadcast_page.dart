@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:goat/screens/chats/pages/yes_no_dialog.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
 
@@ -42,6 +43,20 @@ class _BroadcastPageState extends State<BroadcastPage> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Text(Session.selectedName, softWrap: true, maxLines: 2, style: TextStyle(fontSize: 16),),
+        actions: [IconButton(onPressed: (){
+          // print(Session.selectedId); 
+          showConfirmationDialog(
+            context, 
+            "Do you want delete this broadcast forever?", 
+          (){
+              Navigator.pop(context);
+              request(context, 
+              {
+                "q":"delete_broadcast", 
+                "selected_id": Session.selectedId,
+              }
+              );
+        });}, icon: Icon(Icons.delete_outline))],
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

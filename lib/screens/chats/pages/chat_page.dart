@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
+import 'package:goat/screens/chats/pages/yes_no_dialog.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -17,6 +18,16 @@ class _ChatPageState extends State<ChatPage> {
     request(context, 
     {"q":"chat_page", "user_id": Session.userId, "selected_id": Session.selectedId}
     ).then((ls) { setState((){ if (ls != null) items = ls; });});
+
+    request(context, 
+    {"q":"is_blocker", "selected_id": Session.selectedId, "user_id": Session.userId}
+    ).then((ls) { setState((){ Session.isBlocker = ls[0]["is_blocker"].toString(); }); });
+
+
+    request(context, 
+    {"q":"is_blocked", "selected_id": Session.selectedId, "user_id": Session.userId}
+    ).then((ls) { setState((){ Session.isBlocked = ls[0]["is_blocked"].toString(); }); });
+
   }
 
   @override
@@ -42,6 +53,37 @@ class _ChatPageState extends State<ChatPage> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Text(Session.selectedName),
+        actions: [
+          Session.isBlocked == "0" ? 
+          IconButton(onPressed: (){
+            showConfirmationDialog(context, "Do you want block ${Session.selectedName}?", (){
+              request(context, {
+                "q": "blocks_user",
+                "user_id": Session.userId,
+                "selected_id": Session.selectedId,
+              }).then((ls) {Navigator.pop(context);});
+            });
+          }, icon: Icon(Icons.block_outlined)) : 
+                    IconButton(onPressed: (){
+            showConfirmationDialog(context, "Do you want unblock ${Session.selectedName}?", (){
+              request(context, {
+                "q": "unblocks_user",
+                "user_id": Session.userId,
+                "selected_id": Session.selectedId,
+              }).then((ls) {Navigator.pop(context);});
+            });
+          }, icon: Icon(Icons.block_outlined)),
+
+          IconButton(onPressed: (){
+            showConfirmationDialog(context, "Do you want delete this conversation forever?", (){
+              request(context, {
+                "q": "delete_chat",
+                "user_id": Session.userId,
+                "selected_id": Session.selectedId,
+              }).then((ls) {Navigator.pop(context);});
+            });
+          }, icon: Icon(Icons.delete_outlined)),
+        ],
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
@@ -86,7 +128,9 @@ class _ChatPageState extends State<ChatPage> {
               child: Container(
                 color: Colors.white,
                 padding: EdgeInsets.all(5), 
-                child: TextField(
+                child: Session.isBlocker == "1" ? Text("This conversation is blocked by ${Session.selectedName}") :
+                        Session.isBlocked == "1" ? Text("This conversation is blocked by you") :
+                TextField(
                   keyboardType: TextInputType.multiline,
                   maxLines: 5,
                   minLines: 1,

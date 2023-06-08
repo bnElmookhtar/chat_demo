@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:goat/screens/chats/pages/group_settings.dart';
+import 'package:goat/screens/chats/pages/yes_no_dialog.dart';
 import 'package:goat/server/session.dart';
 import 'package:goat/server/request.dart';
 
@@ -17,6 +19,9 @@ class _GroupPageState extends State<GroupPage> {
     request(context, 
     {"q":"group_page", "selected_id": Session.selectedId}
     ).then((ls) { setState((){ if (ls != null) items = ls; }); _scrollToEnd();});
+    request(context, 
+    {"q":"is_admin", "selected_id": Session.selectedId, "user_id": Session.userId}
+    ).then((ls) { setState((){ Session.isAdmin = ls[0]["is_admin"].toString(); }); });
   }
 
   @override
@@ -41,6 +46,30 @@ class _GroupPageState extends State<GroupPage> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: Text(Session.selectedName),
+        actions: [
+          Session.isAdmin == "1" ? IconButton(onPressed: (){
+            Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GroupSettingsPage(),
+                  ),
+                );
+          }, icon: Icon(Icons.settings_outlined)) : IconButton(onPressed: (){
+            showConfirmationDialog(context, "Do you really want to leave this group?", (){
+              request(context, 
+              {
+                "q":"leave_group", 
+                "selected_id": Session.selectedId,
+                "user_id": Session.userId,
+              }
+              ).then((ls) { setState((){ 
+                if(ls!=null){
+                  Navigator.pop(context);
+                }
+              });});
+            });
+          }, icon: Icon(Icons.remove_circle_outline_sharp)),
+        ],
       ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,

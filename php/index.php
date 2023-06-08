@@ -16,17 +16,108 @@ try {
   }
 
   //////////////////////////////////////////////////////
-  if ($q == "delete_user") {
+  if ($q == "is_admin") {
 
-    // TODO: 
+    $results = $db->run(sprintf("
+      SELECT is_admin 
+      FROM joins_group
+      WHERE user_id = %s AND group_id = %s;
+      ", $_POST["user_id"], $_POST["selected_id"] ));
+
+    done($results);
+  } 
+  //////////////////////////////////////////////////////
+  if ($q == "is_blocker") {
+
+    $results = $db->run(sprintf("
+      SELECT COUNT(*) AS is_blocker
+      FROM blocks_user
+      WHERE blocked_id = %s AND blocker_id = %s;
+      ", $_POST["user_id"], $_POST["selected_id"] ));
+
+    done($results);
+  } 
+  //////////////////////////////////////////////////////
+  if ($q == "is_blocked") {
+
+    $results = $db->run(sprintf("
+      SELECT COUNT(*) AS is_blocked
+      FROM blocks_user
+      WHERE blocker_id = %s AND blocked_id = %s;
+      ", $_POST["user_id"], $_POST["selected_id"] ));
+
+    done($results);
+  }
+
+  
+  //////////////////////////////////////////////////////
+  if ($q == "blocks_user") {
+
+    $results = $db->run(sprintf("
+      INSERT INTO blocks_user(blocker_id, blocked_id) VALUES (%s, %s);
+      ", $_POST["user_id"], $_POST["selected_id"]));
 
     done();
   }
 
+
+  //////////////////////////////////////////////////////
+  if ($q == "unblocks_user") {
+
+    $results = $db->run(sprintf("
+      DELETE FROM blocks_user 
+      WHERE blocker_id = %s AND blocked_id = %s;
+      ", $_POST["user_id"], $_POST["selected_id"]));
+
+    done();
+  }
+ 
+  //////////////////////////////////////////////////////
+  if ($q == "delete_chat") {
+
+    $results = $db->run(sprintf("
+      DELETE FROM sends_user
+      WHERE (sender_id = %s AND receiver_id = %s) OR 
+            (sender_id = %s AND receiver_id = %s);
+      DELETE FROM message
+      WHERE id NOT IN (
+          SELECT sb.message_id
+          FROM sends_broadcast AS sb
+      ) AND id NOT IN (
+          SELECT su.message_id
+          FROM sends_user AS su 
+      ) AND id NOT IN (
+          SELECT sg.message_id
+          FROM sends_group AS sg
+      );
+      ", $_POST["user_id"], $_POST["selected_id"], 
+      $_POST["selected_id"], $_POST["user_id"]));
+
+    done();
+  } 
   //////////////////////////////////////////////////////
   if ($q == "delete_broadcast") {
 
-    // TODO: 
+    $results = $db->run(sprintf("
+      DELETE FROM receives_broadcast
+      WHERE broadcast_id = %s;
+      DELETE FROM sends_broadcast
+      WHERE broadcast_id = %s;
+      DELETE FROM broadcast
+      WHERE id = %s;
+      DELETE FROM message
+      WHERE id NOT IN (
+          SELECT sb.message_id
+          FROM sends_broadcast AS sb
+      ) AND id NOT IN (
+          SELECT su.message_id
+          FROM sends_user AS su 
+      ) AND id NOT IN (
+          SELECT sg.message_id
+          FROM sends_group AS sg
+      );
+      ", $_POST["selected_id"], $_POST["selected_id"], 
+      $_POST["selected_id"]));
 
     done();
   }
@@ -34,44 +125,42 @@ try {
   //////////////////////////////////////////////////////
   if ($q == "delete_group") {
 
-    // TODO: 
+    $results = $db->run(sprintf("
+      DELETE FROM joins_group
+      WHERE group_id = %s;
+      DELETE FROM sends_group
+      WHERE group_id = %s;
+      DELETE FROM group
+      WHERE id = %s;
+      DELETE FROM message
+      WHERE id NOT IN (
+          SELECT sb.message_id
+          FROM sends_broadcast AS sb
+      ) AND id NOT IN (
+          SELECT su.message_id
+          FROM sends_user AS su 
+      ) AND id NOT IN (
+          SELECT sg.message_id
+          FROM sends_group AS sg
+      );
+      ", $_POST["selected_id"], $_POST["selected_id"], 
+      $_POST["selected_id"]));
 
     done();
   }
-
   
   //////////////////////////////////////////////////////
-  if ($q == "delete_group_member") {
+  if ($q == "leave_group") {
 
-    // TODO: 
-
-    done();
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "admin_group_member") {
-
-    // TODO:
+    $results = $db->run(sprintf("
+      DELETE FROM joins_group 
+      WHERE user_id = %s AND group_id = %s",
+      $_POST["user_id"], 
+      $_POST["selected_id"], 
+    ));
 
     done();
   }
-
-   //////////////////////////////////////////////////////
-  if ($q == "unadmin_group_member") {
-
-    // TODO:
-
-    done();
-  }
-
-     //////////////////////////////////////////////////////
-  if ($q == "delete_broadcast_receiver") {
-
-    // TODO:
-
-    done();
-  }
-
 
   //////////////////////////////////////////////////////
   if ($q == "contacts") {
@@ -80,6 +169,28 @@ try {
 
     if (count($results) == 0) 
       error("No contacts other than you");
+
+    done($results);
+  }
+
+  //////////////////////////////////////////////////////
+  if ($q == "add_members") {
+    if (strlen($_POST["ids"]) == 0)
+    error("No users were selected");
+
+    $parts = explode(" ", $_POST["ids"]);
+
+    $query = sprintf("
+      INSERT INTO `joins_group` VALUES 
+      (%s, %s, false)
+      ", $parts[0], $_POST["selected_id"]);
+
+    $parts_slice = array_slice($parts, 1);
+    foreach ($parts_slice as $part) {
+      if (strlen($part) != 0) {
+        $query .= sprintf(",(%s, %s, false)", $part, $_POST["selected_id"]);
+      }
+    }
 
     done($results);
   }
@@ -159,7 +270,7 @@ try {
     if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
       error("Invalid or not a phone number");
 
-    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+    $results = $db->run(sprintf("select id, name from user where phone = '%s'", $_POST["phone"]));
 
     if (count($results) == 0) 
       error("Not registered yet");
@@ -205,6 +316,23 @@ try {
       WHERE id = %s;
       ", 
       $_POST["name"], $_POST["user_id"]));
+
+    done();
+  }
+
+   //////////////////////////////////////////////////////
+  if ($q == "update_group_name") {
+    $name = $_POST["name"];
+
+    if (strlen($name) >= 30 || strlen($name) < 2) 
+    error("Empty name field or not in range 2..29 letters");
+
+    $results = $db->run(sprintf(" 
+      UPDATE `group`
+      SET name = '%s'
+      WHERE id = %s;
+      ", 
+      $_POST["name"], $_POST["selected_id"]));
 
     done();
   }
