@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'dart:convert';
 
 Future request(BuildContext context, Map<String, String> body) async {
   try {
-    // final response = await http.post(Uri.parse("http://localhost/goat/"), body: body); // used to debug 
-    final response = await http.post(Uri.parse("http://192.168.12.1/goat/"), body: body); // used in release
+    // final String url = "http://localhost/goat/"; // used for debug
+    final String url = "http://192.168.12.1/goat/"; // used with release
+    final response = await http.post(Uri.parse(url), body: body);
     if (response.statusCode != 200) {
       throw Exception();
     } 
