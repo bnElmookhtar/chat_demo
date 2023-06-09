@@ -14,6 +14,7 @@ class _ChatPageState extends State<ChatPage> {
   var newMessage = TextEditingController();
   var items = [
   ];
+  var oldItems = [];
 
   void refresh(){
     request(context, 
@@ -61,7 +62,8 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(Duration.zero, (){ _scrollToEnd(); });
+    if (oldItems.length != items.length) Future.delayed(Duration.zero, (){ _scrollToEnd(); });
+    oldItems=items;
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
@@ -110,12 +112,15 @@ class _ChatPageState extends State<ChatPage> {
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   bool isLeft = items[index]["sender_id"].toString() == Session.userId;
+                  String itemDate = items[index]["timestamp"].split(" ")[0];
+                  bool showDate = (index == 0 || itemDate != items[index-1]["timestamp"].split(" ")[0]);
                   return Container( 
                     margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
                     child: Column( 
                       crossAxisAlignment: isLeft ? CrossAxisAlignment.start:CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        showDate ? Center(child: Card(child: Text(itemDate), color:Colors.grey[300],)) : SizedBox(height: 0,),
                         Card(
                           child: Padding(
                             padding: EdgeInsets.all(5),
@@ -125,7 +130,7 @@ class _ChatPageState extends State<ChatPage> {
                         Padding(
                           padding: EdgeInsets.all(5), 
                           child: Text(
-                          items[index]["timestamp"].toString().replaceFirst(" ", "\n")??"",
+                          items[index]["timestamp"].toString().split(" ")[1].substring(0, 5)??"",
                           style: TextStyle(fontSize: 10),
                           textAlign: isLeft ? TextAlign.left : TextAlign.right,
                         ),

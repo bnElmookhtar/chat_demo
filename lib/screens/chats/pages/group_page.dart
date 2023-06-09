@@ -15,11 +15,14 @@ class _GroupPageState extends State<GroupPage> {
   var newMessage = TextEditingController();
   var items = [
   ];
+  var oldItems = [];
 
   void refresh(){
     request(context, 
     {"q":"group_page", "selected_id": Session.selectedId}
-    ).then((ls) { setState((){ if (ls != null) items = ls; }); _scrollToEnd();});
+    ).then((ls) { setState((){ if (ls != null) items = ls; }); 
+      if (oldItems.length!=items.length)_scrollToEnd();
+    oldItems=items;});
     request(context, 
     {"q":"is_admin", "selected_id": Session.selectedId, "user_id": Session.userId}
     ).then((ls) { setState((){ Session.isAdmin = ls[0]["is_admin"].toString(); }); });
@@ -96,12 +99,15 @@ class _GroupPageState extends State<GroupPage> {
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   bool isLeft = items[index]["sender_id"].toString() == Session.userId;
+                  String itemDate = items[index]["timestamp"].split(" ")[0];
+                  bool showDate = (index == 0 || itemDate != items[index-1]["timestamp"].split(" ")[0]);
                   return Container( 
                     margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
                     child: Column( 
                       crossAxisAlignment: isLeft ? CrossAxisAlignment.start:CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        showDate ? Center(child: Card(child: Text(itemDate), color:Colors.grey[300],)) : SizedBox(height: 0,),
                         Card(
                           child: Padding(
                             padding: EdgeInsets.all(5),
@@ -121,7 +127,7 @@ class _GroupPageState extends State<GroupPage> {
                         Padding(
                           padding: EdgeInsets.all(5), 
                           child: Text(
-                          items[index]["timestamp"].toString().replaceFirst(" ", "\n")??"",
+                          items[index]["timestamp"].toString().split(" ")[1].substring(0, 5)??"",
                           style: TextStyle(fontSize: 10),
                           textAlign: isLeft ? TextAlign.left : TextAlign.right,
                         ),

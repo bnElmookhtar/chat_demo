@@ -404,7 +404,7 @@ try {
               WHERE rb.broadcast_id = b.id
           )
       WHERE b.sender_id = %s
-      ORDER BY m.id DESC;
+      ORDER BY m.id DESC, u.name;
       ", $_POST["user_id"]));
 
     if (count($results) == 0) 
@@ -433,7 +433,7 @@ try {
       LEFT JOIN `user` as u 
       ON u.id = sg.sender_id
       WHERE jg.user_id = %s
-      ORDER BY m.id DESC;
+      ORDER BY m.id DESC, g.name;
       ", $_POST["user_id"]));
 
     if (count($results) == 0) 
@@ -454,7 +454,7 @@ try {
       JOIN message as m 
       ON m.id = sg.message_id
       WHERE sg.group_id = %s
-      ORDER BY m.id;
+      ORDER BY m.id, sg.group_id;
       ", $_POST["selected_id"]));
 
     if (count($results) == 0) 
@@ -488,7 +488,7 @@ try {
       FROM sends_broadcast as sb
       JOIN message as m ON m.id = sb.message_id
       WHERE broadcast_id = %s
-      ORDER BY m.id
+      ORDER BY m.id, sb.broadcast_id
       ", $_POST["selected_id"]));
 
     if (count($results) == 0) 
