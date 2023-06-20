@@ -7,540 +7,574 @@ try {
 
   $q = $_POST["q"];
 
-  //////////////////////////////////////////////////////
-  if ($q == "user") {
-
-    $results = $db->run(sprintf("select * from user where id = %s", $_POST["user_id"]));
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "is_admin") {
-
-    $results = $db->run(sprintf("
-      SELECT is_admin 
-      FROM joins_group
-      WHERE user_id = %s AND group_id = %s;
-      ", $_POST["user_id"], $_POST["selected_id"] ));
-
-    done($results);
-  } 
-  //////////////////////////////////////////////////////
-  if ($q == "is_blocker") {
-
-    $results = $db->run(sprintf("
-      SELECT COUNT(*) AS is_blocker
-      FROM blocks_user
-      WHERE blocked_id = %s AND blocker_id = %s;
-      ", $_POST["user_id"], $_POST["selected_id"] ));
-
-    done($results);
-  } 
-  //////////////////////////////////////////////////////
-  if ($q == "is_blocked") {
-
-    $results = $db->run(sprintf("
-      SELECT COUNT(*) AS is_blocked
-      FROM blocks_user
-      WHERE blocker_id = %s AND blocked_id = %s;
-      ", $_POST["user_id"], $_POST["selected_id"] ));
-
-    done($results);
-  }
-
-  
-  //////////////////////////////////////////////////////
-  if ($q == "blocks_user") {
-
-    $results = $db->run(sprintf("
-      INSERT INTO blocks_user(blocker_id, blocked_id) VALUES (%s, %s);
-      ", $_POST["user_id"], $_POST["selected_id"]));
-
-    done();
-  }
-
-
-  //////////////////////////////////////////////////////
-  if ($q == "unblocks_user") {
-
-    $results = $db->run(sprintf("
-      DELETE FROM blocks_user 
-      WHERE blocker_id = %s AND blocked_id = %s;
-      ", $_POST["user_id"], $_POST["selected_id"]));
-
-    done();
-  }
- 
-  //////////////////////////////////////////////////////
-  if ($q == "delete_chat") {
-
-    $results = $db->run(sprintf("
-      DELETE FROM sends_user
-      WHERE (sender_id = %s AND receiver_id = %s) OR 
-            (sender_id = %s AND receiver_id = %s);
-      DELETE FROM message
-      WHERE id NOT IN (
-          SELECT sb.message_id
-          FROM sends_broadcast AS sb
-      ) AND id NOT IN (
-          SELECT su.message_id
-          FROM sends_user AS su 
-      ) AND id NOT IN (
-          SELECT sg.message_id
-          FROM sends_group AS sg
-      );
-      ", $_POST["user_id"], $_POST["selected_id"], 
-      $_POST["selected_id"], $_POST["user_id"]));
-
-    done();
-  } 
-  //////////////////////////////////////////////////////
-  if ($q == "delete_broadcast") {
-
-    $results = $db->run(sprintf("
-      DELETE FROM receives_broadcast
-      WHERE broadcast_id = %s;
-      DELETE FROM sends_broadcast
-      WHERE broadcast_id = %s;
-      DELETE FROM broadcast
-      WHERE id = %s;
-      DELETE FROM message
-      WHERE id NOT IN (
-          SELECT sb.message_id
-          FROM sends_broadcast AS sb
-      ) AND id NOT IN (
-          SELECT su.message_id
-          FROM sends_user AS su 
-      ) AND id NOT IN (
-          SELECT sg.message_id
-          FROM sends_group AS sg
-      );
-      ", $_POST["selected_id"], $_POST["selected_id"], 
-      $_POST["selected_id"]));
-
-    done();
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "delete_group") {
-
-    $results = $db->run(sprintf("
-      DELETE FROM joins_group
-      WHERE group_id = %s;
-      DELETE FROM sends_group
-      WHERE group_id = %s;
-      DELETE FROM group
-      WHERE id = %s;
-      DELETE FROM message
-      WHERE id NOT IN (
-          SELECT sb.message_id
-          FROM sends_broadcast AS sb
-      ) AND id NOT IN (
-          SELECT su.message_id
-          FROM sends_user AS su 
-      ) AND id NOT IN (
-          SELECT sg.message_id
-          FROM sends_group AS sg
-      );
-      ", $_POST["selected_id"], $_POST["selected_id"], 
-      $_POST["selected_id"]));
-
-    done();
-  }
-  
-  //////////////////////////////////////////////////////
-  if ($q == "leave_group") {
-
-    $results = $db->run(sprintf("
-      DELETE FROM joins_group 
-      WHERE user_id = %s AND group_id = %s",
-      $_POST["user_id"], 
-      $_POST["selected_id"], 
-    ));
-
-    done();
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "contacts") {
-
-    $results = $db->run(sprintf("select * from user where id <> %s", $_POST["user_id"]));
-
-    if (count($results) == 0) 
-      error("No contacts other than you");
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "add_members") {
-    if (strlen($_POST["ids"]) == 0)
-    error("No users were selected");
-
-    $parts = explode(" ", $_POST["ids"]);
-
-    $query = sprintf("
-      INSERT INTO `joins_group` VALUES 
-      (%s, %s, false)
-      ", $parts[0], $_POST["selected_id"]);
-
-    $parts_slice = array_slice($parts, 1);
-    foreach ($parts_slice as $part) {
-      if (strlen($part) != 0) {
-        $query .= sprintf(",(%s, %s, false)", $part, $_POST["selected_id"]);
-      }
-    }
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "create_group") {
-    if (strlen($_POST["name"]) == 0) 
-    error("Name field is empty");
-
-    if (strlen($_POST["ids"]) == 0)
-    error("No users were selected");
-
-    $query = sprintf("
-      INSERT INTO `group`(name) VALUES ('%s');
-      INSERT INTO `joins_group` VALUES 
-      (%s, LAST_INSERT_ID(), true)
-      ", $_POST["name"], $_POST["user_id"]);
-
-    $parts = explode(" ", $_POST["ids"]);
-    foreach ($parts as $part) {
-      if (strlen($part) != 0) {
-        $query .= sprintf(",(%s, LAST_INSERT_ID(), false)", $part);
-      }
-    }
-
-    $results = $db->run($query);
-    $results = $db->run(" 
-      SELECT id, name
-      FROM `group`
-      ORDER BY id DESC
-      LIMIT 1
-      ");
-
-    done($results);
-  }
-
-
-  //////////////////////////////////////////////////////
-  if ($q == "create_broadcast") {
-    if (strlen($_POST["ids"]) == 0)
-    error("No users were selected");
-
-    $query = sprintf("
-      INSERT INTO broadcast(sender_id) VALUES (%s);
-      INSERT INTO receives_broadcast VALUES 
-      ", $_POST["user_id"]);
-
-    $parts = explode(" ", $_POST["ids"]);
-    foreach ($parts as $index => $part) {
-      if (strlen($part) != 0) {
-        if ($index > 0) {
-          $query .= ",";
-        }
-        $query .= sprintf("(LAST_INSERT_ID(), %s)", $part);
-      }
-    }
-
-    $results = $db->run($query);
-    $results = $db->run(" 
-      SELECT rb.broadcast_id AS id, u.name 
-      FROM user AS u
-      JOIN receives_broadcast AS rb
-        ON u.id = rb.receiver_id AND rb.broadcast_id =(
-          SELECT MAX(b.id)
-          FROM broadcast AS b 
-        )
-      ");
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "sign_in") {
-
+  if ($q == "login") {
     $phone = $_POST["phone"];
 
     if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
       error("Invalid or not a phone number");
 
-    $results = $db->run(sprintf("select id, name from user where phone = '%s'", $_POST["phone"]));
+    $results = $db->run(sprintf("
+       SELECT *
+       FROM user 
+       WHERE phone = '%s'
+     ", $_POST["phone"]));
 
     if (count($results) == 0) 
       error("Not registered yet");
 
     done($results);
-  } 
+  }
 
-  //////////////////////////////////////////////////////
-  if ($q == "sign_up") {
-
+  if ($q == "register") {
     $phone = $_POST["phone"];
     $name = $_POST["name"];
 
     if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
       error("Invalid or not a phone number");
 
-    if (strlen($name) >= 30 || strlen($name) < 2) 
-      error("Empty name field or not in range 2..29 letters");
-
-    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+    $results = $db->run(sprintf("
+      SELECT id 
+      FROM user 
+      WHERE phone = '%s'
+    ", $_POST["phone"]));
 
     if (count($results) != 0) 
-    error("That phone is already registered");
+      error("This phone is already registered");
 
-    $results = $db->run(sprintf("insert into user (phone, name) values ('%s', '%s')", 
-      $_POST["phone"], $_POST["name"]));
+    if (strlen($name) > 30 || strlen($name) < 2) 
+      error("Empty name field or not in range 2..30 letters");
 
-    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
+    $results = $db->run(sprintf("
+      INSERT INTO user (phone, name) 
+      VALUES ('%s', '%s')
+    ", $_POST["phone"], $_POST["name"]));
+
+    $results = $db->run(sprintf("
+      SELECT *
+      FROM user 
+      WHERE phone = '%s'
+    ", $_POST["phone"]));
 
     done($results);
   }
 
-  //////////////////////////////////////////////////////
-  if ($q == "update_name") {
-    $name = $_POST["name"];
+  if ($q == "get_chats") {
+    $p = $_POST["p"];
+    $userId = $_POST["user_id"];
 
-    if (strlen($name) >= 30 || strlen($name) < 2) 
-    error("Empty name field or not in range 2..29 letters");
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        SELECT b.id, m.text, m.timestamp, u.name
+        FROM broadcast AS b
+        LEFT JOIN sends_broadcast AS sb
+          ON sb.message_id = (
+            SELECT MAX(sb2.message_id)
+            FROM sends_broadcast AS sb2
+            WHERE sb2.broadcast_id = b.id
+          )
+        LEFT JOIN message as m 
+          ON m.id = sb.message_id
+        JOIN user as u 
+          ON u.id IN (
+            SELECT rb.receiver_id 
+            FROM receives_broadcast as rb
+            WHERE rb.broadcast_id = b.id
+          )
+        WHERE b.sender_id = %s
+        ORDER BY m.id DESC, b.id, u.name
+      ", $userId));
 
-    $results = $db->run(sprintf(" 
-      UPDATE user 
-      SET name = '%s'
-      WHERE id = %s;
-      ", 
-      $_POST["name"], $_POST["user_id"]));
+      done($results);
+    } 
 
-    done();
+    if ($p == "person") {
+      $results = $db->run(sprintf("      
+        SELECT u.id, u.name, m.text, m.timestamp, sender_id=%s AS is_sender
+        FROM user AS u 
+        JOIN sends_user AS su1 
+          ON su1.message_id = (
+             SELECT MAX(su2.message_id)
+             FROM sends_user AS su2
+             WHERE su2.receiver_id = u.id AND su2.sender_id = %s
+             OR su2.receiver_id = %s AND su2.sender_id = u.id
+          )
+        JOIN message AS m
+          ON m.id = su1.message_id
+        WHERE 
+          %s = ANY(
+            SELECT su3.sender_id
+            FROM sends_user AS su3
+            WHERE su3.receiver_id = u.id
+            UNION
+            SELECT su3.receiver_id
+            FROM sends_user AS su3
+            WHERE su3.sender_id = u.id
+          )
+        GROUP BY u.id
+        ORDER BY m.id DESC, u.id
+      ", $userId, $userId, $userId, $userId));
+
+      done($results);
+    } 
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        SELECT g.id, g.name, m.text, m.timestamp, u.name AS sender_name, u.id = jg.user_id AS is_sender
+        FROM joins_group AS jg
+        JOIN `group` AS g
+          ON g.id = jg.group_id
+        LEFT JOIN sends_group AS sg1
+          ON sg1.group_id = g.id
+          AND sg1.message_id = (
+              SELECT MAX(sg2.message_id)
+              FROM sends_group AS sg2
+              WHERE sg2.group_id = g.id
+          )
+        LEFT JOIN message AS m 
+          ON m.id = sg1.message_id
+        LEFT JOIN user AS u 
+          ON u.id = sg1.sender_id
+        WHERE jg.user_id = %s
+        ORDER BY m.id DESC, g.id
+      ", $userId));
+
+      done($results);
+    }
   }
 
-   //////////////////////////////////////////////////////
+ if ($q == "get_messages") {
+    $p = $_POST["p"];
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        SELECT m.id, m.text, m.timestamp, 1 AS is_sender
+        FROM sends_broadcast AS sb
+        JOIN message AS m 
+          ON m.id = sb.message_id
+        WHERE sb.broadcast_id = %s
+        ORDER BY m.id;
+      ", $selectedId));
+
+      done($results);
+    } 
+
+    if ($p == "person") {
+      $results = $db->run(sprintf("      
+        SELECT m.id, m.text, m.timestamp, su.sender_id = %s AS is_sender
+        FROM sends_user AS su 
+        JOIN message AS m 
+          ON m.id = su.message_id
+        WHERE su.receiver_id = %s AND su.sender_id = %s
+          OR su.sender_id = %s  AND su.receiver_id = %s;
+      ", $userId, $selectedId, $userId, $selectedId, $userId));
+
+      done($results);
+    } 
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        SELECT m.id, m.text, m.timestamp, u.id AS sender_id, u.name AS sender_name, u.id = %s AS is_sender
+        FROM sends_group AS sg 
+        JOIN user AS u 
+          ON u.id = sg.sender_id
+        JOIN message AS m 
+          ON m.id = sg.message_id
+        WHERE sg.group_id = %s
+        ORDER BY m.id;
+      ", $userId, $selectedId));
+
+      done($results);
+    }
+  }
+
+  if ($q == "send_message") {
+
+    $p = $_POST["p"];
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+    $text = $_POST["text"];
+
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        INSERT INTO message(text) VALUES ('%s');
+        INSERT INTO sends_broadcast VALUES (%s, LAST_INSERT_ID());
+        INSERT INTO sends_user (
+          SELECT u.id, %s, (
+            SELECT MAX(m.id)
+            FROM message AS m
+          )
+          FROM user AS u
+          WHERE u.id IN(
+            SELECT rb.receiver_id
+            FROM receives_broadcast AS rb
+            WHERE rb.broadcast_id = %s
+          ) AND u.id NOT IN (
+            SELECT bu1.blocked_id
+            FROM blocks_user AS bu1
+            WHERE bu1.blocker_id = %s
+          ) AND u.id NOT IN (
+            SELECT bu2.blocker_id
+            FROM blocks_user AS bu2
+            WHERE bu2.blocked_id = %s
+          )
+        )
+      ", $text, $selectedId, $userId, $selectedId, $userId, $userId));
+
+      done($results);
+    } 
+
+    if ($p == "person") {
+      $results = $db->run(sprintf("      
+        INSERT INTO message(text) VALUES ('%s');
+        INSERT INTO sends_user VALUES (%s, %s, LAST_INSERT_ID());
+      ", $text, $selectedId, $userId));
+
+      done($results);
+    } 
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        INSERT INTO message(text) VALUES ('%s');
+        INSERT INTO sends_group VALUES (%s, %s, LAST_INSERT_ID());
+      ", $text, $selectedId, $userId));
+
+      done($results);
+    }
+  }
+
+  if ($q == "get_contacts") {
+    $userId = $_POST["user_id"];
+    $results = $db->run(sprintf("      
+      SELECT *
+      FROM user 
+      WHERE id <> %s AND id NOT IN (
+        SELECT blocked_id
+        FROM blocks_user
+        WHERE blocker_id = id
+        UNION
+        SELECT blocker_id
+        FROM blocks_user
+        WHERE blocked_id = id
+      )
+    ", $userId));
+
+    done($results);
+  }
+
+  if ($q == "create") {
+
+    $p = $_POST["p"];
+    $ids = $_POST["ids"];
+    $userId = $_POST["user_id"];
+
+    if (strlen($ids) == 0)
+      error("No users were selected");
+
+    if ($p == "broadcast") {
+      $query = sprintf("
+        INSERT INTO broadcast(sender_id) VALUES (%s);
+        INSERT INTO receives_broadcast VALUES 
+        ", $userId);
+
+      $parts = explode(" ", $_POST["ids"]);
+      foreach ($parts as $index => $part) {
+        if (strlen($part) != 0) {
+          if ($index > 0) {
+            $query .= ",";
+          }
+          $query .= sprintf("(LAST_INSERT_ID(), %s)", $part);
+        }
+      }
+
+      $results = $db->run($query);
+      $results = $db->run(" 
+        SELECT rb.broadcast_id AS id, u.name 
+        FROM user AS u
+        JOIN receives_broadcast AS rb
+          ON u.id = rb.receiver_id AND rb.broadcast_id =(
+            SELECT MAX(b.id)
+            FROM broadcast AS b 
+          )
+        ");
+
+      done($results);
+    }
+
+    if ($p == "group") {
+      $name = $_POST["name"];
+
+      if (strlen($name) == 0) 
+        error("Name field is empty");
+
+      if (strlen($ids) == 0)
+        error("No users were selected");
+
+      $query = sprintf("
+        INSERT INTO `group`(name) VALUES ('%s');
+        INSERT INTO `joins_group` VALUES 
+        (%s, LAST_INSERT_ID(), true)
+        ", $name, $userId);
+
+      $parts = explode(" ", $ids);
+      foreach ($parts as $part) {
+        if (strlen($part) != 0) {
+          $query .= sprintf(",(%s, LAST_INSERT_ID(), false)", $part);
+        }
+      }
+
+      $results = $db->run($query);
+      $results = $db->run(" 
+        SELECT id, name
+        FROM `group`
+        ORDER BY id DESC
+        LIMIT 1
+      ");
+
+      done($results);
+    }
+  }
+
+  if ($q == "get_settings") {
+
+    $p = $_POST["p"];
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        SELECT u.id, u.name, u.phone
+        FROM user AS u
+        JOIN receives_broadcast AS rb 
+          ON rb.receiver_id = u.id 
+          AND rb.broadcast_id = %s;
+      ", $selectedId));
+
+      done($results);
+    } 
+
+    if ($p == "person") {
+      $results = $db->run(sprintf("
+        SELECT SUM(bu.blocker_id = %s) AS is_blocker, SUM(bu.blocked_id = %s) AS is_blocked
+        FROM blocks_user AS bu
+        WHERE (bu.blocker_id = %s AND bu.blocked_id = %s)
+           OR (bu.blocked_id = %s AND bu.blocker_id = %s);
+      ", $userId, $userId, $userId, $selectedId, $userId, $selectedId));
+
+      done($results);
+    } 
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        SELECT u.id, u.name, u.phone, jg.is_admin
+        FROM user AS u
+        JOIN joins_group AS jg
+          ON jg.user_id = u.id
+          AND jg.group_id = %s;
+      ", $selectedId));
+
+      done($results);
+    }
+  }
+
+  if ($q == "delete_chat") {
+
+    $p = $_POST["p"];
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        DELETE FROM sends_user
+        WHERE message_id IN (
+          SELECT sb.message_id
+          FROM sends_broadcast AS sb 
+          WHERE sb.broadcast_id = %s
+        );
+
+        DELETE FROM sends_broadcast
+        WHERE broadcast_id = %s;
+
+        DELETE FROM message
+        WHERE id NOT IN (
+            SELECT sb.message_id
+            FROM sends_broadcast AS sb
+        ) AND id NOT IN (
+            SELECT su.message_id
+            FROM sends_user AS su 
+        ) AND id NOT IN (
+            SELECT sg.message_id
+            FROM sends_group AS sg
+        )
+      ", $selectedId, $selectedId));
+
+      done($results);
+    }
+
+    if ($p == "person") {
+      $results = $db->run(sprintf("
+        DELETE FROM sends_user
+        WHERE (sender_id = %s AND receiver_id = %s) OR 
+              (receiver_id = %s AND sender_id = %s);
+
+        DELETE FROM message
+        WHERE id NOT IN (
+            SELECT sb.message_id
+            FROM sends_broadcast AS sb
+        ) AND id NOT IN (
+            SELECT su.message_id
+            FROM sends_user AS su 
+        ) AND id NOT IN (
+            SELECT sg.message_id
+            FROM sends_group AS sg
+        )
+      ", $userId, $selectedId, $userId, $selectedId));
+
+      done($results);
+    } 
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        DELETE FROM sends_group
+        WHERE group_id = %s;
+
+        DELETE FROM message
+        WHERE id NOT IN (
+            SELECT sb.message_id
+            FROM sends_broadcast AS sb
+        ) AND id NOT IN (
+            SELECT su.message_id
+            FROM sends_user AS su 
+        ) AND id NOT IN (
+            SELECT sg.message_id
+            FROM sends_group AS sg
+        )
+      ", $selectedId));
+
+      done($results);
+    }
+  }
+
+
+  if ($q == "delete") {
+
+    $p = $_POST["p"];
+    $selectedId = $_POST["selected_id"];
+
+    if ($p == "broadcast") {
+      $results = $db->run(sprintf("      
+        DELETE FROM sends_broadcast
+        WHERE broadcast_id = %s;
+
+        DELETE FROM receives_broadcast
+        WHERE broadcast_id = %s;
+
+        DELETE FROM broadcast 
+        WHERE id = %s;
+
+        DELETE FROM message
+        WHERE id NOT IN (
+            SELECT sb.message_id
+            FROM sends_broadcast AS sb
+        ) AND id NOT IN (
+            SELECT su.message_id
+            FROM sends_user AS su 
+        ) AND id NOT IN (
+            SELECT sg.message_id
+            FROM sends_group AS sg
+        );
+      ", $selectedId, $selectedId, $selectedId));
+
+      done($results);
+    }
+
+    if ($p == "group") {
+      $results = $db->run(sprintf("      
+        DELETE FROM joins_group
+        WHERE group_id = %s;
+
+        DELETE FROM sends_group
+        WHERE group_id = %s;
+
+        DELETE FROM `group`
+        WHERE id = %s;
+
+        DELETE FROM message
+        WHERE id NOT IN (
+            SELECT sb.message_id
+            FROM sends_broadcast AS sb
+        ) AND id NOT IN (
+            SELECT su.message_id
+            FROM sends_user AS su 
+        ) AND id NOT IN (
+            SELECT sg.message_id
+            FROM sends_group AS sg
+        );
+      ", $selectedId, $selectedId, $selectedId));
+
+      done($results);
+    }
+  }
+
+
+  if ($q == "block_user") {
+
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    $results = $db->run(sprintf("      
+      INSERT INTO blocks_user(blocker_id, blocked_id) 
+      VALUES (%s, %s)
+    ", $userId, $selectedId));
+
+    done($results);
+ 
+  }
+
+   if ($q == "unblock_user") {
+
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    $results = $db->run(sprintf("      
+      DELETE FROM blocks_user 
+      WHERE blocker_id = %s AND blocked_id = %s
+    ", $userId, $selectedId));
+
+    done($results);
+ 
+  }
+
+
+   if ($q == "leave_group") {
+
+    $userId = $_POST["user_id"];
+    $selectedId = $_POST["selected_id"];
+
+    $results = $db->run(sprintf("      
+       DELETE FROM joins_group
+       WHERE user_id = %s AND group_id = %s
+    ", $userId, $selectedId));
+
+    done($results);
+ 
+  }
+
+
   if ($q == "update_group_name") {
+    $selectedId = $_POST["selected_id"];
     $name = $_POST["name"];
 
     if (strlen($name) >= 30 || strlen($name) < 2) 
-    error("Empty name field or not in range 2..29 letters");
+      error("Empty name field or not in range 2..30 letters");
 
     $results = $db->run(sprintf(" 
       UPDATE `group`
       SET name = '%s'
       WHERE id = %s;
       ", 
-      $_POST["name"], $_POST["selected_id"]));
-
-    done();
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "update_phone") {
-
-    $phone = $_POST["phone"];
-
-    if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
-      error("Invalid or not a phone number");
-
-    $results = $db->run(sprintf("select id from user where phone = '%s'", $_POST["phone"]));
-
-    if (count($results) != 0) 
-    error("That phone is used by someone else");
-
-    $results = $db->run(sprintf(" 
-      UPDATE user 
-      SET phone = '%s'
-      WHERE id = %s;
-      ", 
-      $_POST["phone"], $_POST["user_id"]));
-
-    done();
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "chats") {
-
-    $results = $db->run(sprintf("      
-      SELECT sender_id+receiver_id-%s as id, name, text as last_message, timestamp
-      FROM sends_user as s1
-      JOIN message ON message.id = s1.message_id
-      JOIN user ON user.id = sender_id+receiver_id-%s
-      WHERE (s1.sender_id=%s OR s1.receiver_id=%s) AND s1.message_id = (
-      SELECT MAX(message_id)
-      FROM sends_user as s2
-      WHERE (s2.sender_id=s1.sender_id AND s2.receiver_id=s1.receiver_id) OR
-      (s2.sender_id=s1.receiver_id AND s2.receiver_id=s1.sender_id)
-      )
-      ORDER BY message.id DESC
-      ", $_POST["user_id"], $_POST["user_id"], $_POST["user_id"], $_POST["user_id"]));
-
-    if (count($results) == 0) 
-      error("No messages found");
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "broadcasts") {
-
-    $results = $db->run(sprintf("      
-      SELECT b.id, m.text as last_message, m.timestamp, u.name
-      FROM broadcast AS b
-      LEFT JOIN sends_broadcast AS sb
-              ON sb.message_id = (
-                      SELECT MAX(sb2.message_id)
-                      FROM sends_broadcast AS sb2
-                      WHERE sb2.broadcast_id = b.id
-              )
-      LEFT JOIN message as m 
-              ON m.id = sb.message_id
-      LEFT JOIN user as u 
-              ON u.id IN (
-              SELECT rb.receiver_id 
-              FROM receives_broadcast as rb
-              WHERE rb.broadcast_id = b.id
-          )
-      WHERE b.sender_id = %s
-      ORDER BY m.id DESC, u.name;
-      ", $_POST["user_id"]));
-
-    if (count($results) == 0) 
-      error("No broadcasts found");
-
-    done($results);
-  }
-
-   //////////////////////////////////////////////////////
-  if ($q == "groups") {
-
-    $results = $db->run(sprintf("      
-      SELECT g.id as `id`, g.name as `name`, 
-      u.name as `sender_name`, m.text as `text`, m.timestamp as `timestamp`
-      FROM joins_group as jg
-      JOIN `group` as g 
-      ON g.id = jg.group_id
-      LEFT JOIN `sends_group` as sg
-      ON sg.group_id = g.id AND sg.message_id = (
-      SELECT MAX(sg2.message_id) 
-      FROM `sends_group` as sg2
-      WHERE sg2.group_id = g.id
-      )
-      LEFT JOIN `message` as m 
-      ON m.id = sg.message_id
-      LEFT JOIN `user` as u 
-      ON u.id = sg.sender_id
-      WHERE jg.user_id = %s
-      ORDER BY m.id DESC, g.name;
-      ", $_POST["user_id"]));
-
-    if (count($results) == 0) 
-      error("No groups found");
-
-    done($results);
-  }
-
-
-  //////////////////////////////////////////////////////
-  if ($q == "group_page") {
-
-    $results = $db->run(sprintf("
-      SELECT u.id as sender_id, u.name as sender_name, m.text as text, m.timestamp as timestamp
-      FROM sends_group as sg 
-      JOIN user as u 
-      ON u.id = sg.sender_id
-      JOIN message as m 
-      ON m.id = sg.message_id
-      WHERE sg.group_id = %s
-      ORDER BY m.id, sg.group_id;
-      ", $_POST["selected_id"]));
-
-    if (count($results) == 0) 
-      error("No messages found");
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "chat_page") {
-
-    $results = $db->run(sprintf("
-      SELECT sender_id, text, timestamp
-      FROM sends_user
-      JOIN message ON message.id = message_id
-      WHERE sender_id=%s AND receiver_id=%s OR sender_id=%s AND receiver_id=%s
-      ORDER BY message_id 
-      ", $_POST["user_id"], $_POST["selected_id"], $_POST["selected_id"], $_POST["user_id"]));
-
-    if (count($results) == 0) 
-      error("No messages found");
-
-    done($results);
-  }
-
-  //////////////////////////////////////////////////////
-  if ($q == "broadcast_page") {
-
-    $results = $db->run(sprintf("
-      SELECT m.text, m.timestamp
-      FROM sends_broadcast as sb
-      JOIN message as m ON m.id = sb.message_id
-      WHERE broadcast_id = %s
-      ORDER BY m.id, sb.broadcast_id
-      ", $_POST["selected_id"]));
-
-    if (count($results) == 0) 
-      error("No messages found");
-
-    done($results);
-  }
-  
-  //////////////////////////////////////////////////////
-  if ($q == "sends_user") {
-
-    $results = $db->run(sprintf("
-      INSERT INTO message(text) VALUES ('%s');
-      INSERT INTO sends_user(sender_id, receiver_id, message_id) VALUES (%s, %s, LAST_INSERT_ID());
-      ", $_POST["text"], $_POST["user_id"], $_POST["selected_id"]));
-
-    done();
-  }
-
-  
-  //////////////////////////////////////////////////////
-  if ($q == "sends_broadcast") {
-
-    $results = $db->run(sprintf("
-      INSERT INTO message(text) VALUES ('%s');
-      INSERT INTO sends_broadcast VALUES (%s, LAST_INSERT_ID());
-      ", $_POST["text"], $_POST["selected_id"]));
-
-    $results = $db->run(sprintf("
-      INSERT INTO sends_user
-      SELECT u.id, %s, (
-        SELECT MAX(m.id)
-        FROM message AS m
-      )
-      FROM user AS u
-      WHERE u.id IN(
-        SELECT rb.receiver_id
-        FROM receives_broadcast AS rb
-        WHERE rb.broadcast_id = %s
-      )
-      ", $_POST["user_id"], $_POST["selected_id"]));
-
-    done();
-  }
-  
-  //////////////////////////////////////////////////////
-  if ($q == "sends_group") {
-
-    $results = $db->run(sprintf("
-      INSERT INTO message(text) VALUES ('%s');
-      INSERT INTO sends_group(sender_id, group_id, message_id) VALUES (%s, %s, LAST_INSERT_ID());
-      ", $_POST["text"], $_POST["user_id"], $_POST["selected_id"]));
+      $name, $selectedId));
 
     done();
   }
@@ -557,7 +591,7 @@ try {
 
 function error($msg)
 {
-  die(sprintf('[{"error":"%s"}]', $msg));
+  die(sprintf('[{"m":"%s"}]', $msg));
 }
 
 function done($arrayOfMaps=[[""=>""]])
