@@ -17,7 +17,7 @@ try {
        SELECT *
        FROM user 
        WHERE phone = '%s'
-     ", $_POST["phone"]));
+     ", $phone));
         
         if (count($results) == 0)
             error("Not registered yet");
@@ -36,7 +36,7 @@ try {
       SELECT id 
       FROM user 
       WHERE phone = '%s'
-    ", $_POST["phone"]));
+    ", $phone));
         
         if (count($results) != 0)
             error("This phone is already registered");
@@ -47,13 +47,13 @@ try {
         $results = $db->run(sprintf("
       INSERT INTO user (phone, name) 
       VALUES ('%s', '%s')
-    ", $_POST["phone"], $_POST["name"]));
+    ", $phone, $name));
         
         $results = $db->run(sprintf("
       SELECT *
       FROM user 
       WHERE phone = '%s'
-    ", $_POST["phone"]));
+    ", $phone));
         
         done($results);
     }
@@ -575,6 +575,49 @@ try {
       WHERE id = %s;
       ", $name, $selectedId));
         
+        done($results);
+    }
+
+    if ($q == "update_name") {
+        $userId = $_POST["user_id"];
+        $name = $_POST["name"];
+
+        if (strlen($name) >= 30 || strlen($name) < 2) 
+        error("Empty name field or not in range 2..29 letters");
+
+        $results = $db->run(sprintf(" 
+          UPDATE user 
+          SET name = '%s'
+          WHERE id = %s;
+          ", 
+          $name, $userId));
+
+        done($results);
+    }
+
+    if ($q == "update_phone") {
+        $userId = $_POST["user_id"];
+        $phone = $_POST["phone"];
+
+        if (!ctype_digit($phone) || strlen($phone) != 11 || substr($phone, 0, 2) != "01") 
+        error("Invalid or not a phone number");
+ 
+        $results = $db->run(sprintf("
+           SELECT *
+           FROM user 
+           WHERE phone = '%s'
+        ", $phone));
+        
+        if (count($results) != 0) 
+        error("That phone is used by someone else");
+
+        $results = $db->run(sprintf(" 
+          UPDATE user 
+          SET phone = '%s'
+          WHERE id = %s;
+        ", 
+        $phone, $user_id));
+
         done($results);
     }
     
