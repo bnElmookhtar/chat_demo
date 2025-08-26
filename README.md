@@ -1,26 +1,25 @@
 # GOATMessenger 📱
 
-A simple cross-platform messaging app built as part of **Database Systems Course Project (May 2023)**.  
-GOATMessenger allows users to send and receive messages via personal chats, groups, and broadcasts.
+A simple **cross-platform messaging app** developed as part of the **Database Systems Course Project (May 2023)**.  
+GOATMessenger enables users to communicate seamlessly through personal chats, groups, and broadcasts.
 
 ---
 
 ## 🚀 Features
-- **User Authentication** – Register and login with unique phone numbers.  
-- **Personal Chats** – One-to-one messaging.  
-- **Group Chats** – Multi-user communication with admin control.  
-- **Broadcasts** – Send a single message to multiple users.  
+- **User Authentication** – Secure registration and login via unique phone numbers.  
+- **Personal Chats** – One-to-one private messaging.  
+- **Group Chats** – Multi-user conversations with admin privileges.  
+- **Broadcasts** – Send a single message to multiple users simultaneously.  
 - **Message Management** – Send, receive, and delete messages.  
-- **Settings** – Manage account info, chats, and group/broadcast settings.  
+- **Settings** – Manage account details, chats, and group/broadcast preferences.  
 
 ---
 
 ## 🛠️ Tech Stack
-- **Frontend and Mobile App:** Flutter (Dart)  
-- **Backend:** PHP (API)
-- **Database:** MySQL
-- **Server:** Apache on Linux
-
+- **Frontend & Mobile App:** Flutter (Dart)  
+- **Backend:** PHP (REST API)  
+- **Database:** MySQL  
+- **Server:** Apache on Linux  
 
 ---
 
@@ -28,34 +27,84 @@ GOATMessenger allows users to send and receive messages via personal chats, grou
 - **Entity Relationship Diagram (ERD):**  
   ![ERD](docs/erdDiagram.png)  
 
-
 ---
 
 ## 📸 Screenshots
 
-- **Login & Registration**  
-  ![Login](docs/screenshots/login.jpg)  
-  ![Register](docs/screenshots/register.jpg)  
+### 🔑 Login & Registration
+<p align="center">
+  <img src="docs/screenshots/login.jpg" alt="Login" width="250"/>
+  <img src="docs/screenshots/register.jpg" alt="Register" width="250"/>
+</p>
 
-- **Home Page (Chats Overview)**  
-  ![Broadcasts](docs/screenshots/broadcasts.jpg)  
-  ![Persons](docs/screenshots/persons.jpg)  
-  ![Groups](docs/screenshots/groups.jpg)  
+### 🏠 Home Page (Chats Overview)
+<p align="center">
+  <img src="docs/screenshots/broadcasts.jpg" alt="Broadcasts" width="220"/>
+  <img src="docs/screenshots/persons.jpg" alt="Persons" width="220"/>
+  <img src="docs/screenshots/groups.jpg" alt="Groups" width="220"/>
+</p>
 
-- **Chat Pages**  
-  ![Broadcast Chat](docs/screenshots/broadcast.jpg)  
-  ![Personal Chat](docs/screenshots/sendMessage.jpg)  
-  ![Group Chat](docs/screenshots/group.jpg)  
+### 💬 Chat Pages
+<p align="center">
+  <img src="docs/screenshots/broadcast.jpg" alt="Broadcast Chat" width="220"/>
+  <img src="docs/screenshots/sendMessage.jpg" alt="Personal Chat" width="220"/>
+  <img src="docs/screenshots/group.jpg" alt="Group Chat" width="220"/>
+</p>
 
-- **Create Chats**  
-  ![Contacts](docs/screenshots/contacts.jpg)  
-  ![Create Broadcast](docs/screenshots/createBroadcast.jpg)  
-  ![Create Group](docs/screenshots/createGroup.jpg)  
+### ➕ Create Chats
+<p align="center">
+  <img src="docs/screenshots/contacts.jpg" alt="Contacts" width="220"/>
+  <img src="docs/screenshots/createBroadcast.jpg" alt="Create Broadcast" width="220"/>
+  <img src="docs/screenshots/createGroup.jpg" alt="Create Group" width="220"/>
+</p>
 
-- **Settings & Management**  
-  ![Account Settings](docs/screenshots/account.jpg)  
-  ![Broadcast Settings](docs/screenshots/broadcastSettings.jpg)  
-  ![Personal Chat Settings](docs/screenshots/personSettings.jpg)  
-  ![Group Settings (Admin)](docs/screenshots/groupSettingsAdmin.jpg)  
-  ![Group Settings (Member)](docs/screenshots/groupSettingsMember.jpg)  
-  ![Blocked Users](docs/screenshots/blocked.jpg)  
+### ⚙️ Settings & Management
+<p align="center">
+  <img src="docs/screenshots/account.jpg" alt="Account Settings" width="200"/>
+  <img src="docs/screenshots/broadcastSettings.jpg" alt="Broadcast Settings" width="200"/>
+  <img src="docs/screenshots/personSettings.jpg" alt="Personal Chat Settings" width="200"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/groupSettingsAdmin.jpg" alt="Group Settings (Admin)" width="200"/>
+  <img src="docs/screenshots/groupSettingsMember.jpg" alt="Group Settings (Member)" width="200"/>
+  <img src="docs/screenshots/blocked.jpg" alt="Blocked Users" width="200"/>
+</p>
+
+
+
+---
+
+## 📂 Project Structure
+
+The repository is organized as follows:
+
+```
+.
+├── android/                  # Android-specific project files and build configs
+├── docs/                     # Documentation assets (ERD, screenshots, etc.)
+├── lib/                      # Flutter application source code
+│   ├── data/                 # Data handling (API requests, sessions, etc.)
+│   ├── pages/                # UI screens and app pages
+│   ├── tools/                # Utility functions (formatting, helpers)
+│   ├── widgets/              # Reusable UI components (dialogs, snackbars)
+│   └── main.dart             # App entry point
+├── linux/                    # Linux-specific project files
+├── php/                      # Backend PHP API endpoint(s)
+├── pubspec.yaml              # Flutter dependencies and configuration
+├── analysis_options.yaml      # Linting and code style rules
+└── README.md                 # Project documentation
+```
+
+### ▶️ How to Run
+1. **Install dependencies**  
+   ```bash
+   flutter pub get
+   ```
+2. **Run the app (mobile or desktop)**  
+   ```bash
+   flutter run
+   ```
+3. **Backend setup**  
+   - Deploy `php/index.php` to an Apache server with MySQL configured.  
+   - Update API endpoint URLs in the Flutter app if needed.  
